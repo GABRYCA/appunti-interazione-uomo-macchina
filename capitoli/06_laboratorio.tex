@@ -1,0 +1,90 @@
+\chapter{Laboratorio ed Esercitazioni}
+
+In questo capitolo vengono raccolti gli snippet di codice essenziali (in ambiente MATLAB) relativi alle esercitazioni del corso. Questi esempi formano la base pratica per lo sviluppo del progetto d'esame.
+
+\section{Pipeline Analisi ECG}
+L'elaborazione dell'elettrocardiogramma richiede la pulizia del segnale prima dell'individuazione dei picchi R.
+\begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}, stringstyle=\color{purple}]
+% 1. Rimozione della deriva di linea di base
+ecg_detrend = detrend(ecg_raw, 'linear');
+
+% 2. Filtraggio passa-banda
+% (es. per rimuovere rumore muscolare)
+[b, a] = butter(3, [0.5 40]/(fs/2), 'bandpass');
+% filtfilt evita sfasamenti temporali
+ecg_filt = filtfilt(b, a, ecg_detrend);
+
+% 3. Individuazione dei picchi R (complesso QRS)
+% MinProminence e' essenziale per ignorare
+% picchi spuri come le onde T o P
+[peaks, locs] = islocalmax(ecg_filt, 'MinProminence', 0.5);
+
+figure; hold on;
+plot(t, ecg_filt);
+plot(t(locs), ecg_filt(locs), 'r*', 'MarkerSize', 8);
+title('ECG con Picchi R');
+\end{lstlisting}
+
+\section{Pipeline Analisi EDA / GSR}
+Per l'attività elettrodermica si rende necessaria la separazione della componente tonica (SCL) da quella fasica (SCR).
+\begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}]
+% 1. Estrazione Componente Tonica (SCL)
+% - Filtro Passa-Basso molto stretto
+fc_scl = 0.05; % Hz
+[b_ton, a_ton] = butter(2, fc_scl/(fs/2), 'low');
+GSR_tonica = filtfilt(b_ton, a_ton, gsr_raw);
+
+% 2. Estrazione Componente Fasica (SCR)
+GSR_fasica = gsr_raw - GSR_tonica; % Sottrazione
+
+% In alternativa, si puo' filtrare direttamente
+% in passa-banda la fasica
+fc_scr = 1; % Hz (es. da 0.05 a 1 Hz)
+[b_fas, a_fas] = butter(2, fc_scr/(fs/2), 'low');
+GSR_fasica_filt = filtfilt(b_fas, a_fas, GSR_fasica);
+
+% 3. Individuazione dei picchi emotivi
+[peaks_eda, locs_eda] = islocalmax(GSR_fasica_filt,
+'MinProminence', 0.01);
+\end{lstlisting}
+
+\section{Audio e Aliasing (Sottocampionamento)}
+Per testare gli effetti del teorema di Nyquist-Shannon è utile procedere con la decimazione (downsampling) di un segnale audio pre-registrato.
+\begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}]
+% Caricamento audio originale
+% (fs = 44100 Hz solitamente)
+[y, fs_orig] = audioread('brano.wav');
+
+% Fattore di sottocampionamento
+M = 4;
+y_down = y(1:M:end); % Salto M-1 campioni
+fs_nuova = fs_orig / M; % Nuova frequenza di camp.
+
+% Riproduzione: si notera' l'aliasing se
+% fs_nuova < 2*f_max_segnale
+sound(y_down, fs_nuova);
+\end{lstlisting}
+
+\section{Machine Learning Pratico (SVM)}
+Nell'ecosistema MATLAB l'applicazione di una SVM linearmente o non linearmente separabile è agevolata da funzioni built-in.
+\begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}]
+% Addestramento di una Support Vector Machine
+% X = matrice delle features (N samples x M features)
+% Y = array delle labels (N samples)
+svm_model = fitcsvm(X, Y, 'KernelFunction', 'linear',
+'Standardize', true);
+
+% Estrazione dei vettori di supporto
+sv = svm_model.SupportVectors;
+
+% Cross Validation (Holdout o K-fold)
+cv_model = crossval(svm_model, 'KFold', 5);
+
+% Stima dell'errore (o loss) generale
+loss = kfoldLoss(cv_model);
+fprintf('Accuratezza stimata: %.2f%%\n', (1-loss)*100);
+
+% Predizione su nuovi dati
+Y_pred = predict(svm_model, X_test);
+\end{lstlisting}
+
