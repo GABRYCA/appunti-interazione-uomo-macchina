@@ -3,14 +3,20 @@
 In questo capitolo vengono raccolti gli snippet di codice essenziali (in ambiente MATLAB) relativi alle esercitazioni del corso. Questi esempi formano la base pratica per lo sviluppo del progetto d'esame.
 
 \section{Pipeline Analisi ECG}
-L'elaborazione dell'elettrocardiogramma richiede la pulizia del segnale prima dell'individuazione dei picchi R.
+L'elaborazione dell'elettrocardiogramma richiede la pulizia del segnale prima dell'individuazione dei picchi R, al fine di estrarre l'Heart Rate (HR) e gli intervalli R-R.
+
+\begin{itemize}
+    \item \textbf{Pre-processing:} Utilizzo di \texttt{detrend} per rimuovere la \textit{wandering baseline} (deriva a bassa frequenza causata dalla respirazione o movimenti). Successivamente, si applica un filtro Passa-Banda (es. Butterworth tra 0.5 Hz e 25 Hz) per rimuovere rumori ad alta frequenza come i tremori muscolari e l'interferenza di rete (50 Hz).
+    \item \textbf{Feature Extraction:} Uso di \texttt{islocalmax} (o \texttt{findpeaks}) con un parametro \texttt{MinProminence} adeguato per identificare esclusivamente i picchi R (che sono i più alti), ignorando le onde P e T. Dai picchi trovati, si calcola la differenza temporale tra essi (intervalli R-R) e si ricava l'HR in battiti al minuto (bpm).
+\end{itemize}
+
 \begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}, stringstyle=\color{purple}]
 % 1. Rimozione della deriva di linea di base
 ecg_detrend = detrend(ecg_raw, 'linear');
 
 % 2. Filtraggio passa-banda
-% (es. per rimuovere rumore muscolare)
-[b, a] = butter(3, [0.5 40]/(fs/2), 'bandpass');
+% (es. per rimuovere rumore muscolare e rete)
+[b, a] = butter(3, [0.5 25]/(fs/2), 'bandpass');
 % filtfilt evita sfasamenti temporali
 ecg_filt = filtfilt(b, a, ecg_detrend);
 
@@ -19,6 +25,10 @@ ecg_filt = filtfilt(b, a, ecg_detrend);
 % picchi spuri come le onde T o P
 [peaks, locs] = islocalmax(ecg_filt, 'MinProminence', 0.5);
 
+% 4. Calcolo degli intervalli R-R e HR
+rr_intervals_sec = diff(locs) / fs;
+hr_bpm = 60 ./ rr_intervals_sec;
+
 figure; hold on;
 plot(t, ecg_filt);
 plot(t(locs), ecg_filt(locs), 'r*', 'MarkerSize', 8);
@@ -26,7 +36,16 @@ title('ECG con Picchi R');
 \end{lstlisting}
 
 \section{Pipeline Analisi EDA / GSR}
-Per l'attività elettrodermica si rende necessaria la separazione della componente tonica (SCL) da quella fasica (SCR).
+Per l'attività elettrodermica si rende necessaria la separazione della componente tonica (SCL) da quella fasica (SCR) per poter valutare lo stress o il carico cognitivo.
+
+\begin{itemize}
+    \item \textbf{Pre-processing:} Applicazione di un filtro Passa-Basso con frequenza di taglio molto bassa (es.
+    0.05 Hz) per estrarre la Skin Conductance Level (SCL, l'andamento lento e generalizzato).
+    Sottraendo la SCL al segnale originale (\texttt{Raw - SCL}) si ottiene la Skin Conductance Response (SCR, i picchi rapidi associati agli eventi).
+    \item \textbf{Feature Extraction:} Uso di \texttt{findpeaks} o \texttt{islocalmax} sulla SCR per contare il numero di picchi emotivi (eventi).
+    L'ampiezza o l'area sotto questi picchi è direttamente proporzionale all'arousal (attivazione emotiva) dell'utente in risposta a uno stimolo.
+\end{itemize}
+
 \begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}]
 % 1. Estrazione Componente Tonica (SCL)
 % - Filtro Passa-Basso molto stretto
@@ -43,9 +62,10 @@ fc_scr = 1; % Hz (es. da 0.05 a 1 Hz)
 [b_fas, a_fas] = butter(2, fc_scr/(fs/2), 'low');
 GSR_fasica_filt = filtfilt(b_fas, a_fas, GSR_fasica);
 
-% 3. Individuazione dei picchi emotivi
-[peaks_eda, locs_eda] = islocalmax(GSR_fasica_filt,
+% 3. Individuazione dei picchi emotivi (Eventi fasici)
+[peaks_eda, locs_eda] = islocalmax(GSR_fasica,
 'MinProminence', 0.01);
+num_eventi = sum(peaks_eda); % Conteggio eventi di stress
 \end{lstlisting}
 
 \section{Audio e Aliasing (Sottocampionamento)}
@@ -65,26 +85,36 @@ fs_nuova = fs_orig / M; % Nuova frequenza di camp.
 sound(y_down, fs_nuova);
 \end{lstlisting}
 
-\section{Machine Learning Pratico (SVM)}
-Nell'ecosistema MATLAB l'applicazione di una SVM linearmente o non linearmente separabile è agevolata da funzioni built-in.
+\section{Machine Learning Pratico (SVM e k-NN)}
+Nell'ecosistema MATLAB l'applicazione di algoritmi di Machine Learning (come SVM e k-NN) è agevolata da funzioni built-in.
+È essenziale impostare la \textbf{standardizzazione dei dati} (\texttt{'Standardize', true}) per assicurarsi che le feature abbiano media e deviazione standard comparabili.
+Inoltre, l'utilizzo della \textbf{K-Fold Cross Validation} tramite \texttt{crossval} è fondamentale per avere stime di accuratezza più affidabili e
+generalizzabili rispetto al semplice holdout (train-test split), specialmente per dataset di dimensioni contenute.
+
 \begin{lstlisting}[language=Matlab, frame=single, commentstyle=\color{green!50!black}, keywordstyle=\color{blue}]
 % Addestramento di una Support Vector Machine
-% X = matrice delle features (N samples x M features)
-% Y = array delle labels (N samples)
+% X = matrice delle feature,
+& Y = array delle etichette (labels)
 svm_model = fitcsvm(X, Y, 'KernelFunction', 'linear',
 'Standardize', true);
 
-% Estrazione dei vettori di supporto
-sv = svm_model.SupportVectors;
+% Addestramento equivalente con k-NN
+knn_model = fitcknn(X, Y, 'NumNeighbors', 5,
+'Standardize', true);
 
-% Cross Validation (Holdout o K-fold)
+% Validazione tramite K-Fold (es. K=5) al posto
+% del semplice Holdout
 cv_model = crossval(svm_model, 'KFold', 5);
 
-% Stima dell'errore (o loss) generale
-loss = kfoldLoss(cv_model);
-fprintf('Accuratezza stimata: %.2f%%\n', (1-loss)*100);
+% Stima dell'errore generale (media sui K fold)
+cv_loss = kfoldLoss(cv_model);
+fprintf('Accuratezza stimata K-Fold: %.2f%%\n',
+(1-cv_loss)*100);
 
-% Predizione su nuovi dati
-Y_pred = predict(svm_model, X_test);
+% Valutazione visiva delle performance
+% con Matrice di Confusione
+Y_pred = kfoldPredict(cv_model);
+figure;
+confusionchart(Y, Y_pred);
+title('Matrice di Confusione (Cross-Validation)');
 \end{lstlisting}
-

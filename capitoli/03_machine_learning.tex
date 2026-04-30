@@ -25,6 +25,29 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
     \end{itemize}
     Per prevenire un grave overfitting, i criteri di arresto (stopping criteria) includono: massima profondità dell'albero, minimo numero di campioni per formare una foglia, ed eventuale \textit{pruning} (potatura) ex-post.
 
+    \vspace{0.5cm}
+    \begin{figure}[h!]
+        \centering
+        \begin{tikzpicture} [
+            node distance=1.5cm and 2cm,
+            mynode/.style={draw, rectangle, rounded corners, fill=blue!10, text width=2.5cm, align=center},
+            leafnode/.style={draw, rectangle, rounded corners, fill=green!20, text width=2cm, align=center}
+        ]
+            \node[mynode] (root) {Feature $X_1 > 5$ ? \\ \small Gini: 0.50};
+            \node[mynode, below left=of root] (left) {Feature $X_2 < 2$ ? \\ \small Gini: 0.32};
+            \node[leafnode, below right=of root] (right) {Classe A \\ \small Gini: 0.00};
+            \node[leafnode, below left=of left] (ll) {Classe B \\ \small Gini: 0.00};
+            \node[leafnode, below right=of left] (lr) {Classe A \\ \small Gini: 0.15};
+
+            \draw[->, thick] (root) -- node[above left] {Sì} (left);
+            \draw[->, thick] (root) -- node[above right] {No} (right);
+            \draw[->, thick] (left) -- node[above left] {Sì} (ll);
+            \draw[->, thick] (left) -- node[above right] {No} (lr);
+        \end{tikzpicture}
+        \caption{Esempio di un piccolo Albero Decisionale basato sulla riduzione dell'impurità (Gini).}
+    \end{figure}
+    \vspace{0.5cm}
+
     \item \textbf{Random Forest:} Espande il concetto del Decision Tree tramite l'approccio \textbf{Ensemble Learning}. Combina numerosi alberi addestrati su varianti randomiche del dataset (\textbf{Bagging} o Bootstrap Aggregating) estraendo le feature in modo casuale ad ogni split (\textbf{Feature Randomness}). Il risultato finale si ottiene per \textit{Majority Voting}, assicurando eccezionale robustezza e minor overfitting.
 
     \item \textbf{k-Nearest Neighbors (kNN):} Algoritmo pigro (\textit{lazy learner}) che classifica un nuovo punto analizzando la classe maggioritaria espressa dai suoi $k$ vicini più prossimi (usando distanze come l'Euclidea). Lo spazio può essere rappresentato da \textbf{Diagrammi di Voronoi}.
@@ -39,12 +62,12 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
         w \cdot x + b = 0
     \end{equation}
     Il margine separatore tra le classi corrisponde a $\frac{2}{||w||}$. Per massimizzarlo si ricorre all'ottimizzazione convessa.
-    Nella realtà le classi non sono mai perfettamente separabili. Si introducono le \textbf{Variabili Slack} ($\xi$) per tollerare misclassificazioni, regolate dal parametro $C$ (\textit{Soft Margin}): un $C$ grande impone confini severi, abbassando gli errori ma alzando l'overfitting.
+    Nella realtà le classi non sono mai perfettamente separabili. Si introducono le \textbf{Variabili Slack} ($\xi$) per tollerare misclassificazioni, regolate dal parametro $C$ (\textit{Soft Margin}): un $C$ grande impone confini severi, abbassando gli errori sui dati di training ma alzando il rischio di overfitting. Un $C$ piccolo permette un margine più ampio e tollera più errori, migliorando la generalizzazione.
     Infine, si sfrutta il \textbf{Kernel Trick} (es. Polinomiale, RBF - Radial Basis Function) per mappare implicitamente e a basso costo computazionale le feature in uno spazio dimensionale superiore per superare la non-linearità.
 
     \begin{figure}[h!]
         \centering
-        \begin{tikzpicture}[scale=1]
+        \begin{tikzpicture}[scale=1.2]
             % Asse coordinate
             \draw[->,thick] (0,0) -- (6,0) node[right] {$x_1$};
             \draw[->,thick] (0,0) -- (0,4) node[above] {$x_2$};
@@ -63,17 +86,38 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
             \draw[blue, thick, dashed] (3.5+0.07,0.5+0.07) circle (4pt); % SV blu 2
 
             % Iperpiani
-            \draw[thick, black] (1,0) -- (4,4) node[right] {Iperpiano Ottimale};
-            \draw[thick, gray, dashed] (0,0.5) -- (2.5,3.8);
-            \draw[thick, gray, dashed] (2,-0.5) -- (5,3.5);
+            \draw[thick, black] (1,0) -- (4,4) node[right, black] {$w \cdot x + b = 0$};
+            \draw[thick, red, dashed] (0,0.5) -- (2.5,3.8) node[above right] {$w \cdot x + b = -1$};
+            \draw[thick, blue, dashed] (2,-0.5) -- (5,3.5) node[right] {$w \cdot x + b = 1$};
 
             % Margine
-            \draw[<->, thick] (2.1, 2) -- (3.2, 1.2) node[midway, sloped, above] {Margine};
+            \draw[<->, thick] (2.1, 1.45) -- (3.2, 0.65) node[midway, sloped, below] {Margine $\frac{2}{||w||}$};
         \end{tikzpicture}
-        \caption{Rappresentazione concettuale di una SVM lineare bidimensionale che massimizza il margine.}
+        \caption{Rappresentazione concettuale di una SVM lineare bidimensionale. Sono evidenziati i vettori di supporto e le equazioni degli iperpiani corrispondenti al margine massimo.}
     \end{figure}
 
     \item \textbf{Logistic Regression (Regressione Logistica):} Algoritmo parametrico che restituisce, tramite la \textbf{funzione Sigmoide} $\sigma(z) = \frac{1}{1 + e^{-z}}$, la probabilità di appartenenza a una classe (da 0 a 1). La funzione di costo (\textbf{Loss}) è la Log-Loss (o Cross-Entropy), la quale è matematicamente garantita essere \textbf{convessa}: questo assicura che l'algoritmo di ottimizzazione tramite iterazioni di \textbf{Discesa del Gradiente} convergerà sempre a un unico minimo globale ottimale, senza impantanarsi in minimi locali.
+
+    \vspace{0.5cm}
+    \begin{figure}[h!]
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=8cm, height=5cm,
+                domain=-6:6, samples=100,
+                axis lines=middle,
+                xtick={-4,-2,0,2,4},
+                ytick={0, 0.5, 1},
+                xlabel=$z$, ylabel=$\sigma(z)$,
+                enlargelimits=true,
+                grid=both
+            ]
+            \addplot[blue, thick] {1 / (1 + exp(-x))};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Funzione Sigmoide utilizzata nella Logistic Regression per mappare un valore reale $z$ in una probabilità $(0, 1)$.}
+    \end{figure}
+    \vspace{0.5cm}
 \end{itemize}
 
 \section{Metriche di Valutazione}

@@ -33,6 +33,33 @@ Qualsiasi segnale fisiologico, essendo analogico e continuo, deve passare in un 
     \end{equation}
     Rispettare questa condizione permette di evitare il fenomeno dell'\textbf{aliasing}. Nel caso di sottocampionamento o decimazione (riduzione intenzionale di $f_s$), si verifica un "ripiegamento" delle frequenze superiori a $f_s/2$ (frequenza di Nyquist) sulle frequenze inferiori. Questo effetto crea una distorsione nota come "effetto fisarmonica" nello spettro, rendendo impossibile la ricostruzione fedele del segnale originale.
 
+    \vspace{0.5cm}
+    \begin{figure}[h!]
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=10cm, height=5cm,
+                domain=0:10, samples=200,
+                axis lines=middle,
+                xtick=\empty, ytick=\empty,
+                xlabel=$t$, ylabel=$A$,
+                enlargelimits=true,
+                legend style={at={(0.5,-0.2)}, anchor=north, legend columns=-1, draw=none}
+            ]
+            \addplot[blue, thick] {sin(deg(2*pi*0.9*x))};
+            \addlegendentry{Segnale originale ($f_1$)}
+
+            \addplot[red, dashed, thick] {sin(deg(2*pi*0.1*x))};
+            \addlegendentry{Alias ricostruito ($f_2$)}
+
+            \addplot[only marks, mark=*, samples=11] {sin(deg(2*pi*0.9*x))};
+            \addlegendentry{Campioni}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Fenomeno dell'aliasing: un segnale ad alta frequenza campionato troppo lentamente viene confuso con una bassa frequenza.}
+    \end{figure}
+    \vspace{0.5cm}
+
     \item \textbf{Quantizzazione}: Consiste nella mappatura di valori continui di ampiezza in un insieme finito di $L$ livelli discreti, definiti dal numero di bit $b$:
     \begin{equation}
         L = 2^b
@@ -41,9 +68,35 @@ Qualsiasi segnale fisiologico, essendo analogico e continuo, deve passare in un 
     \begin{equation}
         \Delta = \frac{V_{max} - V_{min}}{L - 1}
     \end{equation}
-    L'arrotondamento ai livelli produce un inevitabile \textbf{errore di quantizzazione}, assimilabile a un rumore additivo ed indipendente dal segnale in caso di risoluzione sufficiente.
+    L'arrotondamento ai livelli produce un inevitabile \textbf{errore di quantizzazione}, assimilabile a un rumore additivo ed indipendente dal segnale in caso di risoluzione sufficiente. L'errore è confinato nell'intervallo $[-\Delta/2, \Delta/2]$.
 
-    \item \textbf{Dithering}: È una tecnica usata nella quantizzazione che consiste nell'aggiunta volontaria di rumore bianco prima del quantizzatore per \emph{decorrelare} l'errore di quantizzazione dal segnale d'interesse, convertendo le distorsioni non-lineari e i toni spuri in un rumore di fondo uniforme, migliorando in media la fedeltà del segnale specialmente alle basse ampiezze.
+    \vspace{0.5cm}
+    \begin{figure}[h!]
+        \centering
+        \begin{tikzpicture}
+            \begin{axis}[
+                width=10cm, height=6cm,
+                domain=0:4*pi, samples=100,
+                axis lines=middle,
+                xtick=\empty, ytick=\empty,
+                xlabel=$t$, ylabel=$A$,
+                enlargelimits=true,
+                legend style={at={(0.5,-0.2)}, anchor=north, legend columns=-1, draw=none}
+            ]
+
+            \addplot[blue, thick] {sin(deg(x))};
+            \addlegendentry{Segnale Continuo}
+
+            \addplot[red, thick, const plot] {round(sin(deg(x))*3)/3};
+            \addlegendentry{Segnale Quantizzato}
+
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Quantizzazione: approssimazione del segnale continuo a livelli discreti (gradini).}
+    \end{figure}
+    \vspace{0.5cm}
+
+    \item \textbf{Dithering}: È una tecnica usata nella quantizzazione che consiste nell'aggiunta volontaria di rumore bianco (con una particolare distribuzione probabilistica, es. densità di probabilità PDF triangolare o rettangolare) prima del quantizzatore per \emph{decorrelare} l'errore di quantizzazione dal segnale d'interesse, convertendo le distorsioni non-lineari e i toni spuri in un rumore di fondo uniforme, migliorando in media la fedeltà del segnale specialmente alle basse ampiezze.
 \end{itemize}
 
 \section{Energia, Potenza e Signal to Noise Ratio (SNR)}
@@ -56,8 +109,13 @@ L'acquisizione di segnali biologici è afflitta da instabilità e rumore, che pu
 
 Matematicamente, per caratterizzare un segnale valuto:
 \begin{itemize}
-    \item \textbf{Energia:} $\displaystyle E = \lim_{T \to \infty} \int_{-T}^{T} |x(t)|^2 dt$
-    \item \textbf{Potenza Media:} $\displaystyle P = \lim_{T \to \infty} \frac{1}{2T} \int_{-T}^{T} |x(t)|^2 dt$
+    \item \textbf{Energia:}
+    \\ Continuo: $\displaystyle E = \lim_{T \to \infty} \int_{-T}^{T} |x(t)|^2 dt$
+    \\ Discreto: $\displaystyle E = \sum_{n=-\infty}^{+\infty} |x[n]|^2$
+    \vspace{0.2cm}
+    \item \textbf{Potenza Media:}
+    \\ Continuo: $\displaystyle P = \lim_{T \to \infty} \frac{1}{2T} \int_{-T}^{T} |x(t)|^2 dt$
+    \\ Discreto: $\displaystyle P = \lim_{N \to \infty} \frac{1}{2N+1} \sum_{n=-N}^{N} |x[n]|^2$
 \end{itemize}
 
 Il \textbf{SNR (Signal-to-Noise Ratio)} è la metrica principale per definire la pulizia di un segnale rispetto ai disturbi acquisiti dai sensori o creati dai circuiti:
@@ -106,10 +164,37 @@ Per pulire i segnali vengono adoperati vari filtri di elaborazione del segnale d
     Attenzione: aumentare troppo l'ordine porta a instabilità e fenomeni di \emph{ringing} (oscillazioni spurie o sovraelongazioni pre e post-filtro).
     \item[Frequenza Lineari vs Non-Lineari (Media vs Mediano):] \mbox{} \\
     \begin{itemize}
-        \item Il \textbf{Filtro della Media (Moving Average)} è un filtro lineare.
+        \item Il \textbf{Filtro della Media (Moving Average)} è un filtro lineare. L'equazione per una finestra di dimensione $W$ (dispari, con $k=(W-1)/2$) è:
+        \begin{equation}
+            y[n] = \frac{1}{W} \sum_{i=-k}^{k} x[n-i]
+        \end{equation}
         È ottimo per attenuare rumore bianco (gaussiano).
         Tuttavia, in presenza di un rumore impulsivo (outlier), la media ne risente e finisce per "spalmare" l'errore sui campioni vicini, addolcendo eccessivamente i fronti di salita (bordi netti).
-        \item Il \textbf{Filtro Mediano} è un operatore di rango \textbf{non lineare}.
+
+        \item Il \textbf{Filtro Mediano} è un operatore di rango \textbf{non lineare}. L'equazione è:
+        \begin{equation}
+            y[n] = \text{mediano}( \{ x[n-k], \dots, x[n], \dots, x[n+k] \} )
+        \end{equation}
         Eccellente e robusto per scartare rumori impulsivi (spike o salt \& pepper): un singolo valore outlier viene completamente ignorato dal calcolo del mediano; in più, esso riesce a preservare in modo intatto i fronti di salita rapidi del segnale, risultando essenziale in morfologie a gradino o picchi importanti.
     \end{itemize}
 \end{description}
+
+\vspace{0.5cm}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|p{4.5cm}|p{5cm}|p{5cm}|}
+        \hline
+        \textbf{Caratteristica} & \textbf{Filtro Media (Moving Avg)} & \textbf{Filtro Mediano} \\
+        \hline
+        \textbf{Tipo} & Lineare & Non Lineare \\
+        \hline
+        \textbf{Rumore Gaussiano} & Attenua bene & Distorce leggermente \\
+        \hline
+        \textbf{Rumore Impulsivo (Spike)} & Spalma l'errore (inefficace) & Elimina lo spike (ottimo) \\
+        \hline
+        \textbf{Bordi netti / Gradini} & Addolcisce (sfoca) & Preserva intatti \\
+        \hline
+    \end{tabular}
+    \caption{Tabella comparativa: Filtro Media vs Filtro Mediano.}
+\end{table}
+\vspace{0.5cm}

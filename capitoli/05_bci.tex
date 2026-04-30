@@ -39,26 +39,67 @@ Un sistema tipico è composto da varie fasi di elaborazione:
 
 \section{Bande di Frequenza EEG}
 Quando si analizzano segnali cerebrali non-invasivi, i tracciati EEG vengono usualmente divisi in bande di frequenza, ciascuna associata a determinati stati mentali:
-\begin{itemize}
-    \item \textbf{Delta ($\delta$) ($<4$ Hz):} Sonno profondo in adulti, o tracciati anomali da vegli (patologie).
-    \item \textbf{Theta ($\theta$) ($4-7$ Hz):} Sonno leggero, sonnolenza marcata, attività prevalente in stadi di forte e profonda meditazione.
-    \item \textbf{Alpha ($\alpha$) ($8-13$ Hz):} Stato di veglia ma rilassato, tipico di quando si chiudono gli occhi. È il ritmo più facile da individuare nei lobi occipitali.
-    \item \textbf{Beta ($\beta$) ($14-30$ Hz):} Stato di veglia attiva, concentrazione, pensieri complessi o calcoli matematici.
-    \item \textbf{Gamma ($\gamma$) ($>30$ Hz):} Percezione crociata, alto livello cognitivo o consolidamento di memorie rapide (meno usato a causa di artefatti muscolari coprenti alle stesse frequenze).
-    \item \textbf{Ritmo Mu ($\mu$) ($8-12$ Hz):} Si sovrappone all'Alpha ma è localizzato sulla \textbf{corteccia motoria}. Si desincronizza (riduce di ampiezza) durante la preparazione o l'esecuzione di un movimento motorio (\textbf{Event-Related Desynchronization - ERD}).
-\end{itemize}
+
+\vspace{0.5cm}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|p{3cm}|p{2cm}|p{8cm}|}
+        \hline
+        \textbf{Banda} & \textbf{Frequenza} & \textbf{Stato Cognitivo / Attività} \\
+        \hline
+        \textbf{Delta ($\delta$)} & $< 4$ Hz & Sonno profondo negli adulti, patologie in veglia. \\
+        \hline
+        \textbf{Theta ($\theta$)} & $4 - 7$ Hz & Sonnolenza, meditazione profonda, sonno leggero. \\
+        \hline
+        \textbf{Alpha ($\alpha$)} & $8 - 13$ Hz & Veglia rilassata (occhi chiusi). Dominante nei lobi occipitali. \\
+        \hline
+        \textbf{Ritmo Mu ($\mu$)} & $8 - 12$ Hz & Sovrapposto all'Alpha ma sulla corteccia motoria. Si desincronizza durante il movimento reale o immaginato. \\
+        \hline
+        \textbf{Beta ($\beta$)} & $14 - 30$ Hz & Veglia attiva, forte concentrazione, calcolo mentale. \\
+        \hline
+        \textbf{Gamma ($\gamma$)} & $> 30$ Hz & Elaborazione multisensoriale complessa, consolidamento memorie (spesso disturbata da artefatti muscolari). \\
+        \hline
+    \end{tabular}
+    \caption{Tabella riassuntiva delle principali bande di frequenza EEG.}
+\end{table}
+\vspace{0.5cm}
 
 \section{Sistema Internazionale 10-20}
-Per standardizzare il posizionamento degli elettrodi sullo scalpo si usa il \textbf{Sistema 10-20}, basato su percentuali della distanza tra punti anatomici chiave (Nasion, Inion, e preauricolari). Le lettere indicano il lobo sottostante (\textbf{F} = Frontale, \textbf{C} = Centrale, \textbf{T} = Temporale, \textbf{P} = Parietale, \textbf{O} = Occipitale), mentre i numeri indicano l'emisfero:
+Per standardizzare il posizionamento degli elettrodi sullo scalpo si usa il \textbf{Sistema 10-20}, basato su percentuali (10\% o 20\%) della distanza totale tra punti anatomici chiave (Nasion, Inion, e preauricolari). Le lettere indicano il lobo sottostante (\textbf{F} = Frontale, \textbf{C} = Centrale, \textbf{T} = Temporale, \textbf{P} = Parietale, \textbf{O} = Occipitale), mentre i numeri indicano l'emisfero:
 \begin{itemize}
-    \item \textbf{Numeri Dispari:} Emisfero Sinistro.
-    \item \textbf{Numeri Pari:} Emisfero Destro.
-    \item \textbf{Z (Zero):} Linea Mediana (Midline).
+    \item \textbf{Numeri Dispari (1, 3, 5...):} Emisfero Sinistro.
+    \item \textbf{Numeri Pari (2, 4, 6...):} Emisfero Destro.
+    \item \textbf{Z (Zero):} Linea Mediana (Midline, es. Fz, Cz, Pz).
 \end{itemize}
 
 \section{Paradigmi BCI}
 \subsection{Paradigma P300 Speller}
 È uno dei sistemi BCI più famosi, permette a un utente di scrivere parole. Sfrutta il potenziale \textbf{P300}, una deflessione positiva dell'onda EEG (Event-Related Potential o \textbf{ERP}) che compare circa \textbf{300 ms} dopo uno stimolo atteso e raro (effetto \textbf{Oddball}).
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture} [
+        node distance=2cm,
+        box/.style={draw, rectangle, rounded corners, minimum height=1cm, align=center, fill=gray!10},
+        arrow/.style={->, thick, >=Stealth}
+    ]
+        \node[box] (start) {Inizio Trial \\ (Matrice 6x6)};
+        \node[box, below=of start] (flash) {Flash casuale di \\ Riga o Colonna};
+        \node[box, right=2.5cm of flash] (record) {Registrazione EEG \\ (Finestra 0-800 ms)};
+        \node[box, right=2.5cm of start] (check) {Target raggiunto? \\ (ERP P300)};
+        \node[box, right=2cm of check, fill=green!20] (end) {Rilevamento Lettera \\ per intersezione};
+
+        \draw[arrow] (start) -- (flash);
+        \draw[arrow] (flash) -- (record);
+        \draw[arrow] (record) |- (check);
+        \draw[arrow] (check) -- node[above] {No} (start);
+        \draw[arrow] (check) -- node[above] {Sì} (end);
+    \end{tikzpicture}
+    \caption{Diagramma a stati semplificato del funzionamento del P300 Speller.}
+\end{figure}
+\vspace{0.5cm}
+
 \begin{itemize}
     \item \textbf{Funzionamento:} L'utente guarda uno schermo con una matrice $6 \times 6$ di lettere. Le righe e le colonne lampeggiano in modo casuale. Quando lampeggia la riga/colonna contenente la lettera desiderata, il cervello emette l'ERP P300. Intersecando riga e colonna la macchina deduce il carattere.
     \item \textbf{Averaging:} Poiché il P300 ha un'ampiezza di pochi $\mu V$, sommerso dal rumore di fondo (basso SNR), si richiede l'\textbf{Averaging} (media sincrona) su svariati flash. Mediando $N$ ripetizioni (trial), il SNR migliora di un fattore proporzionale a $\sqrt{N}$.

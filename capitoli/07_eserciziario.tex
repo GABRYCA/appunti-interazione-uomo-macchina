@@ -1,0 +1,80 @@
+\chapter{Eserciziario per lo Scritto}
+
+Questo capitolo contiene esercizi risolti passo-passo simili a quelli proposti nelle esercitazioni e all'esame scritto.
+
+\section{Esercizio Tipo 1: Campionamento e Aliasing}
+\textbf{Testo:} Dato il segnale $x(t) = \sin(2\pi \cdot 100 t)$, calcolare la frequenza di Nyquist.
+Se il segnale viene campionato a $F_s = 150 \text{ Hz}$, qual è la frequenza alias percepita?
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+
+\begin{enumerate}
+    \item Identificare la frequenza del segnale: Dalla formula $x(t) = \sin(2\pi f t)$, otteniamo $f_{max} = 100 \text{ Hz}$.
+    \item Calcolare la frequenza di Nyquist: $F_{nyq} = 2 \cdot f_{max} = 2 \cdot 100 = 200 \text{ Hz}$.
+    \item Calcolo dell'alias: Poiché $F_s = 150 \text{ Hz} < 200 \text{ Hz}$, non rispettiamo il teorema di Nyquist e si verificherà aliasing.
+    La frequenza alias percepita si ottiene calcolando la distanza della frequenza del segnale dal multiplo più vicino di $F_s$:
+    $f_{alias} = |F_s - f_{max}| = |150 - 100| = 50 \text{ Hz}$.
+\end{enumerate}
+
+\section{Esercizio Tipo 2: Quantizzazione, SNR e Bitrate}
+\textbf{Testo:} Si vuole quantizzare un segnale con dinamica in ingresso tra 0 V e 5 V utilizzando un ADC a 8 bit.
+Calcolare i livelli, lo step $\Delta$, l'approssimazione del rapporto segnale/rumore di quantizzazione (SNR) in dB, e il bitrate se campionato a $F_s = 200 \text{ Hz}$.
+Cosa succede se si passa da 8 a 16 bit?
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+
+\begin{enumerate}
+    \item \textbf{Livelli ($L$):} $L = 2^b = 2^8 = 256$ livelli.
+    \item \textbf{Step $\Delta$:} $\Delta = \frac{V_{max} - V_{min}}{L - 1} = \frac{5 - 0}{255} \approx 0.0196 \text{ V}$.
+    \item \textbf{SNR (SQNR):} $SQNR_{dB} \approx 6.02 \cdot b + 1.76 = 6.02 \cdot 8 + 1.76 = 49.92 \text{ dB}$.
+    \item \textbf{Bitrate:} Il bitrate si definisce come $R = b \cdot F_s = 8 \cdot 200 = 1600 \text{ bps}$ (bit per secondo).
+    \item \textbf{Passaggio a 16 bit:} L'SNR diventa $6.02 \cdot 16 + 1.76 = 98.08 \text{ dB}$, con una notevole diminuzione del rumore (incremento di qualità).
+    Il bitrate raddoppia ($16 \cdot 200 = 3200 \text{ bps}$).
+\end{enumerate}
+
+\section{Esercizio Tipo 3: Filtraggio 1D (Array)}
+\textbf{Testo:} Dato l'array $x = [2, 3, 2, 20, 3, 2, 1]$, applicare un filtro Mediano (finestra $W=3$) e un filtro di Media Mobile (Media, $W=3$, con zero padding o mantenendo i bordi inalterati).
+Spiegare le differenze.
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+
+Consideriamo i punti interni per semplicità.
+Valutiamo $i=3$ (valore 20) che è chiaramente uno spike.
+\begin{itemize}
+    \item \textbf{Filtro Mediano ($W=3$):}
+    \begin{itemize}
+        \item Centrato sul 20 ($x[2], x[3], x[4]$): $\{2, 20, 3\} \rightarrow \text{ordinato} \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
+        \item Centrato sul primo 3 ($x[1], x[2], x[3]$): $\{3, 2, 20\} \rightarrow \text{ordinato} \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
+    \end{itemize}
+    Il valore $y$ mediano scarta l'outlier "20" considerandolo un rumore impulsivo. $y \approx [2, 3, 3, 3, 2, 2, 1]$.
+    \item \textbf{Filtro Media ($W=3$):}
+    \begin{itemize}
+        \item Centrato sul 20: $\frac{2 + 20 + 3}{3} = \frac{25}{3} \approx 8.33$.
+        \item Centrato sul primo 3: $\frac{3 + 2 + 20}{3} = \frac{25}{3} \approx 8.33$.
+    \end{itemize}
+    Il picco si è schiacciato ($\sim 8.3$ invece di $20$), ma si è "spalmato" sui campioni vicini alterandoli nettamente.
+\end{itemize}
+
+\section{Esercizio Tipo 4: Valutazione Modelli (Matrice di Confusione)}
+\textbf{Testo:} Dato il risultato di un modello di rilevamento Spam (o Malattia), con $TP = 40, TN = 950, FP = 10, FN = 5$.
+Calcolare Accuracy, Precision, Recall e F1-Score.
+Spiegare quando l'Accuracy è ingannevole.
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+
+\begin{itemize}
+    \item \textbf{Accuracy:} $\frac{TP + TN}{TP + TN + FP + FN} = \frac{40 + 950}{1005} = \frac{990}{1005} = 0.985$ (98.5\%).
+    \item \textbf{Precision:} $\frac{TP}{TP + FP} = \frac{40}{40 + 10} = \frac{40}{50} = 0.80$ (80\%).
+    \item \textbf{Recall (Sensitivity):} $\frac{TP}{TP + FN} = \frac{40}{40 + 5} = \frac{40}{45} \approx 0.888$ (88.8\%).
+    \item \textbf{F1-Score:} $2 \cdot \frac{Precision \cdot Recall}{Precision + Recall} \approx 2 \cdot \frac{0.8 \cdot 0.888}{0.8 + 0.888} \approx 0.84$.
+\end{itemize}
+
+\textbf{Analisi:} L'Accuracy è molto alta (98.5\%) e ingannevole.
+Questo perché il dataset è estremamente sbilanciato (Class Imbalance): i veri negativi ($TN$) dominano.
+Se un classificatore dicesse sempre "Non Spam", avrebbe un accuracy di $\frac{960}{1005} = 95.5\%$, pur non avendo capacità predittiva.
+In questi casi, F1-Score e Recall sono metriche più significative.
+

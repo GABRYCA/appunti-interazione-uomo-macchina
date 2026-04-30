@@ -1,0 +1,28 @@
+﻿\chapter{Casi di Studio: Dataset DEAP}
+
+\section{Introduzione a DEAP}
+Il dataset \textbf{DEAP} (Database for Emotion Analysis using Physiological Signals) è uno standard di fatto per l'Affective Computing basato su segnali fisiologici e video facciali. Creato per sviluppare sistemi di riconoscimento delle emozioni, ha introdotto concetti essenziali riguardo all'acquisizione multimodale.
+
+Le caratteristiche principali del protocollo di induzione emotiva usato in DEAP:
+\begin{itemize}
+    \item \textbf{Stimoli usati:} Video musicali da 1 minuto scelti per indurre emozioni uniformemente distribuite nel piano di Russell.
+    \item \textbf{Segnali Acquisiti:}
+    \begin{itemize}
+        \item Segnali fisiologici classici periferici: GSR, ECG, Respiro, Temperatura, EOG, EMG.
+        \item Segnali Cerebrali: \textbf{EEG a 32 canali}.
+        \item Segnali Visivi: \textbf{Face Video} dei partecipanti.
+    \end{itemize}
+\end{itemize}
+
+\section{Formato di Valutazione (Self-Assessment)}
+Subito dopo ogni video, il soggetto valutava il proprio stato emotivo usando il sistema visivo dei manichini \textbf{SAM (Self-Assessment Manikins)}, esprimendosi sulle seguenti dimensioni (su scala continua 1-9):
+\begin{itemize}
+    \item \textbf{Arousal (Attivazione):} da Calmo a Eccitato.
+    \item \textbf{Valence (Valenza):} da Triste/Negativo a Felice/Positivo.
+    \item \textbf{Dominance (Controllo):} da Sottomesso a Dominante.
+    \item \textbf{Liking (Gradimento):} quanto al soggetto è piaciuto il video.
+\end{itemize}
+
+\section{Modality Fusion}
+Una delle conclusioni più importanti emerse dallo studio sul paper DEAP riguarda la \textbf{Modality Fusion} (fusione multimodale). Unendo \textbf{feature estratte dall'EEG} assieme a \textbf{feature estratte dai segnali periferici e dal video/audio del volto}, le prestazioni dei classificatori sono notevolmente superiori rispetto all'uso di un singolo biosegnale.
+
