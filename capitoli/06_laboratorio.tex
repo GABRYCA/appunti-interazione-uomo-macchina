@@ -16,7 +16,7 @@ ecg_detrend = detrend(ecg_raw, 'linear');
 
 % 2. Filtraggio passa-banda
 % (es. per rimuovere rumore muscolare e rete)
-[b, a] = butter(3, [0.5 25]/(fs/2), 'bandpass');
+[b, a] = butter(2,[0.5 25]/(fs/2), 'bandpass');
 % filtfilt evita sfasamenti temporali
 ecg_filt = filtfilt(b, a, ecg_detrend);
 
@@ -57,10 +57,10 @@ GSR_tonica = filtfilt(b_ton, a_ton, gsr_raw);
 GSR_fasica = gsr_raw - GSR_tonica; % Sottrazione
 
 % In alternativa, si puo' filtrare direttamente
-% in passa-banda la fasica
-fc_scr = 1; % Hz (es. da 0.05 a 1 Hz)
-[b_fas, a_fas] = butter(2, fc_scr/(fs/2), 'low');
-GSR_fasica_filt = filtfilt(b_fas, a_fas, GSR_fasica);
+% in passa-banda il segnale grezzo per isolare la fasica
+fc_scr = [0.05 1]; % Hz (es. da 0.05 a 1 Hz)
+[b_fas, a_fas] = butter(2, fc_scr/(fs/2), 'bandpass');
+GSR_fasica_filt = filtfilt(b_fas, a_fas, gsr_raw);
 
 % 3. Individuazione dei picchi emotivi (Eventi fasici)
 [peaks_eda, locs_eda] = islocalmax(GSR_fasica,

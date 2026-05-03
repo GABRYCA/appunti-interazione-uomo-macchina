@@ -43,17 +43,19 @@ Spiegare le differenze.
 
 Consideriamo i punti interni per semplicità.
 Valutiamo $i=3$ (valore 20) che è chiaramente uno spike.
+
 \begin{itemize}
     \item \textbf{Filtro Mediano ($W=3$):}
     \begin{itemize}
-        \item Centrato sul 20 ($x[2], x[3], x[4]$): $\{2, 20, 3\} \rightarrow \text{ordinato} \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
-        \item Centrato sul primo 3 ($x[1], x[2], x[3]$): $\{3, 2, 20\} \rightarrow \text{ordinato} \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
+        \item Centrato sul 20 ($x[3], x[4], x[5]$): $\{2, 20, 3\} \rightarrow \text{ordinato } \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
+        \item Centrato sul secondo 2 ($x[2], x[3], x[4]$): $\{3, 2, 20\} \rightarrow \text{ordinato } \{2, 3, 20\} \rightarrow \text{Mediano} = 3$.
     \end{itemize}
-    Il valore $y$ mediano scarta l'outlier "20" considerandolo un rumore impulsivo. $y \approx [2, 3, 3, 3, 2, 2, 1]$.
+    Il valore $y$ mediano scarta l'outlier "20" considerandolo un rumore impulsivo. $y \approx[2, 3, 3, 3, 2, 2, 1]$.
+
     \item \textbf{Filtro Media ($W=3$):}
     \begin{itemize}
         \item Centrato sul 20: $\frac{2 + 20 + 3}{3} = \frac{25}{3} \approx 8.33$.
-        \item Centrato sul primo 3: $\frac{3 + 2 + 20}{3} = \frac{25}{3} \approx 8.33$.
+        \item Centrato sul secondo 2: $\frac{3 + 2 + 20}{3} = \frac{25}{3} \approx 8.33$.
     \end{itemize}
     Il picco si è schiacciato ($\sim 8.3$ invece di $20$), ma si è "spalmato" sui campioni vicini alterandoli nettamente.
 \end{itemize}

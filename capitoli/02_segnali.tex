@@ -27,7 +27,8 @@ In \verb|Esercizio_ECG.m| e \verb|Esercizio_GSR.m| sono state esplorate tecniche
 \section{Teoria del Campionamento e Quantizzazione}
 Qualsiasi segnale fisiologico, essendo analogico e continuo, deve passare in un form factor digitale per poter essere elaborato dalla macchina.
 \begin{itemize}
-    \item \textbf{Campionamento}: Determinato dal teorema di Nyquist-Shannon. Fissata una frequenza massima $f_{max}$ del segnale di interesse, la frequenza di campionamento $f_s$ deve essere:
+    \item \textbf{Campionamento}: Determinato dal teorema di Nyquist-Shannon.
+    Fissata una frequenza massima $f_{max}$ del segnale di interesse, la frequenza di campionamento $f_s$ deve essere:
     \begin{equation}
         f_s > 2 f_{max}
     \end{equation}
@@ -46,14 +47,12 @@ Qualsiasi segnale fisiologico, essendo analogico e continuo, deve passare in un 
                 enlargelimits=true,
                 legend style={at={(0.5,-0.2)}, anchor=north, legend columns=-1, draw=none}
             ]
-            \addplot[blue, thick] {sin(deg(2*pi*0.9*x))};
-            \addlegendentry{Segnale originale ($f_1$)}
-
-            \addplot[red, dashed, thick] {sin(deg(2*pi*0.1*x))};
-            \addlegendentry{Alias ricostruito ($f_2$)}
-
-            \addplot[only marks, mark=*, samples=11] {sin(deg(2*pi*0.9*x))};
-            \addlegendentry{Campioni}
+                \addplot[blue, thick] {sin(deg(2*pi*0.9*x))};
+                \addlegendentry{Segnale originale ($f_1$)}
+                \addplot[red, dashed, thick] {-sin(deg(2*pi*0.1*x))};
+                \addlegendentry{Alias ricostruito ($f_2$)}
+                \addplot[only marks, mark=*, samples=11] {sin(deg(2*pi*0.9*x))};
+                \addlegendentry{Campioni}
             \end{axis}
         \end{tikzpicture}
         \caption{Fenomeno dell'aliasing: un segnale ad alta frequenza campionato troppo lentamente viene confuso con una bassa frequenza.}
@@ -64,10 +63,12 @@ Qualsiasi segnale fisiologico, essendo analogico e continuo, deve passare in un 
     \begin{equation}
         L = 2^b
     \end{equation}
-    La distanza tra due livelli consecutivi, ovvero la \textbf{risoluzione (step d'intervallo)}, indicata con $\Delta$, è data da:
+    La distanza tra due livelli consecutivi, ovvero la \textbf{risoluzione (step d'intervallo)}, indicata con $\Delta$, è data formalmente da:
     \begin{equation}
-        \Delta = \frac{V_{max} - V_{min}}{L - 1}
+        \Delta = \frac{x_{max} - x_{min}}{L}
     \end{equation}
+    \textit{Nota: nella pratica e in alcuni esercizi, per mappare esattamente i valori limite tra 0 e $L-1$, è frequente calcolare lo step dividendo per $L-1$.}
+
     L'arrotondamento ai livelli produce un inevitabile \textbf{errore di quantizzazione}, assimilabile a un rumore additivo ed indipendente dal segnale in caso di risoluzione sufficiente. L'errore è confinato nell'intervallo $[-\Delta/2, \Delta/2]$.
 
     \vspace{0.5cm}
@@ -110,7 +111,7 @@ L'acquisizione di segnali biologici è afflitta da instabilità e rumore, che pu
 Matematicamente, per caratterizzare un segnale valuto:
 \begin{itemize}
     \item \textbf{Energia:}
-    \\ Continuo: $\displaystyle E = \lim_{T \to \infty} \int_{-T}^{T} |x(t)|^2 dt$
+    \\ Continuo: $\displaystyle E = \int_{-\infty}^{+\infty} |x(t)|^2 dt$
     \\ Discreto: $\displaystyle E = \sum_{n=-\infty}^{+\infty} |x[n]|^2$
     \vspace{0.2cm}
     \item \textbf{Potenza Media:}
