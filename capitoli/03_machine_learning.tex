@@ -6,13 +6,24 @@ Il machine learning è essenziale per la classificazione dei segnali nelle inter
 Nel contesto delle interfacce cervello-macchina, è fondamentale saper ricondurre un insieme di campioni fisiologici ad uno stato o ad un comando preciso (e.g. muovi a destra, stato di relax).
 Nel corso si predilige l'approccio \textbf{Supervisionato}, provvisto cioè di \textit{label} (etichette) per ogni dato di input. Il dataset viene classicamente diviso in set di \textit{Training} (per addestrare il modello) e \textit{Testing} (per validare la generalizzazione), facendo attenzione ad evitare i fenomeni di \textit{Overfitting} (il modello impara a memoria i dati di addestramento) e \textit{Underfitting} (il modello non riesce a cogliere le relazioni dei dati).
 
-\subsection{Validazione e Sbilanciamento}
-La semplice suddivisione in Train e Test (Holdout) può generare distorsioni dovute alla casualità dello split. Si adopera pertanto la \textbf{K-fold Cross Validation}: il dataset viene diviso in $K$ partizioni (fold); iterativamente, $K-1$ fold addestrano il modello e il rimanente funge da test, ripetendo $K$ volte. Le metriche finali sono la media delle singole iterazioni.
-La validazione deve anche affrontare il problema dello \textbf{sbilanciamento delle classi} (es. molti stati di "relax", pochi di "allarme"). Tecniche comuni includono:
+\subsection{Validazione, Sbilanciamento e Data Leakage}
+La semplice suddivisione in Train e Test (Holdout) può generare distorsioni dovute alla casualità dello split. Oltre alla classica \textbf{K-fold Cross Validation}, nell'ambito dei segnali fisiologici è fondamentale utilizzare la:
+
 \begin{itemize}
-    \item \textbf{Oversampling:} Replicare campioni della classe minoritaria.
-    \item \textbf{Undersampling:} Ridurre i campioni della classe maggioritaria.
-    \item \textbf{SMOTE:} Creare nuovi campioni sintetici interpolando la classe minoritaria.
+    \item \textbf{LOSO-CV (Leave One Subject Out Cross-Validation):} A differenza della K-Fold dove i dati si mescolano casualmente, qui si rispetta l'identità del soggetto.
+    Se si hanno $N$ soggetti, si addestra il modello su $N-1$ soggetti e si usa il soggetto escluso come test. Questo processo si ripete $N$ volte.
+    È fondamentale per testare se il modello sa \textit{generalizzare} su un nuovo utente mai visto prima.
+\end{itemize}
+
+\paragraph{Il problema del Data Leakage (Fughe di dati)}
+Nei segnali fisiologici (EEG, ECG) i dati prelevati dallo stesso soggetto sono molto correlati.
+Se usassimo una validazione casuale, dati del "Soggetto A" finirebbero sia nel training che nel test: il modello imparerebbe a riconoscere il soggetto e non l'emozione, falsando i risultati (overfitting).
+Lo stesso pericolo si corre con le tecniche di \textbf{Data Augmentation}:
+\begin{itemize}
+    \item \textbf{Oversampling (es. SMOTE):} Replicare i campioni minoritari.
+    Rischio: i dati clonati potrebbero finire sia nel train che nel test.
+    \item \textbf{Segmentation (Finestratura):} Dividere un segnale continuo in finestre (spesso sovrapposte).
+    Rischio: due finestre sovrapposte (quindi quasi identiche) finiscono una nel train e una nel test.
 \end{itemize}
 
 \section{Algoritmi Principali}
@@ -118,5 +129,57 @@ Per quantificare l'efficienza degli algoritmi di classificazione, ci si affida s
     \item \textbf{F1-Score:} Media armonica pesata di Precision e Recall.
 \end{itemize}
 
-\section{Estrazione di Features (Feature Extraction)}
-Prima di alimentare i modelli (in particolar modo nel caso SVM, ma per tutti limitatamente alle performance), occorre fornire al modello solo dati salienti per evitare il fenomeno della \textit{Curse of Dimensionality} (Maledizione della dimensionalità). Per i segnali fisici si estraggono perciò parametri \textbf{temporali} (es. deviazione standard, media e andamento del battito ECG) e/o \textbf{frequenziali} (come la \textit{Power Spectral Density} nei casi dell'EEG come i ritmi Alpha, Beta o Theta \textit{Waves}).
+\section{Gestione dei Dati (Input Analysis) ed Estrazione Features}
+L'elaborazione dei segnali fisiologici deve tenere conto del fatto che i segnali dipendono fortemente dalle caratteristiche soggettive (età, sesso, salute, allenamento). Esistono due modi per condurre l'analisi:
+
+\begin{itemize}
+    \item \textbf{Analisi Subject-based:} Si crea un classificatore specifico per \textit{ogni} singolo soggetto.
+    Il training e il test si fanno sui dati della stessa persona.
+    È più preciso ma meno universale.
+    \item \textbf{Analisi Population-based:} Si usa un solo classificatore addestrato sui dati di \textit{tutti} i soggetti.
+    Più difficile da addestrare a causa delle enormi differenze fisiologiche tra le persone.
+    Richiede necessariamente la validazione LOSO-CV.
+\end{itemize}
+
+\subsection{Normalizzazione del Segnale vs Normalizzazione delle Features}
+Per confrontare i dati acquisiti da dispositivi diversi o soggetti diversi, è vitale la normalizzazione, ma bisogna distinguere due fasi ben distinte:
+\begin{enumerate}
+    \item \textbf{Normalizzazione del Segnale:} Si fa sui dati grezzi (es.
+    scalare l'ampiezza di un ECG o ricampionare in base alla frequenza cardiaca a riposo dell'utente). Si effettua \textit{prima} di estrarre le features.
+    \item \textbf{Normalizzazione (Scaling) delle Features:} Dopo aver estratto parametri statistici (media, varianza) o di forma (picchi), questi valori avranno scale molto diverse (es. l'altezza in metri e lo stipendio in euro). Si applicano tecniche come il \textbf{Min-Max Scaling} o lo \textbf{Z-Score} (\textit{Standardization}) \textit{prima} di passarli al classificatore, ad esempio nel k-NN, affinché nessuna variabile domini le altre nel calcolo delle distanze.
+\end{enumerate}
+
+\subsection{Feature Extraction e Feature Selection}
+Dai segnali si estraggono feature temporali (statistiche o dei picchi, es. IBI, RMSSD) e frequenziali (Power Spectral Density).
+Tuttavia, avere \textit{troppe} feature non è sempre un bene.
+Per eliminare quelle ridondanti si usa la \textbf{Feature Selection}, che estrae solo un sottoinsieme di variabili rilevanti.
+
+Un metodo classico è l'uso della \textbf{Matrice di Correlazione (Indice di Pearson)}: calcola quanto due variabili variano assieme (da -1 a 1).
+Se due variabili sono fortemente correlate (es.
+vicine a 1 o -1), una delle due è ridondante e si può eliminare per alleggerire il modello e prevenire l'overfitting.
+
+\section{Valutazione del Modello: Bias-Variance Tradeoff}
+Nel Machine Learning, il successo di un modello si basa sull'equilibrio di tre componenti dell'errore (Errore Totale = $\text{Bias}^2$ + Varianza + Errore Irriducibile).
+\begin{itemize}
+    \item \textbf{Bias (Errore di approssimazione):} Indica modelli \textit{troppo semplici} (es. usare una retta per un problema quadratico).
+    Il modello ignora i pattern dei dati, causando \textbf{Underfitting} (alto bias).
+    \item \textbf{Varianza (Errore di sensibilità):} Indica modelli \textit{troppo complessi} che imparano a memoria il dataset di training, compreso il rumore casuale.
+    Causa \textbf{Overfitting} (alta varianza).
+    \item \textbf{Errore irriducibile:} Rumore intrinseco dei sensori o mancanza di variabili chiave.
+    Non si può eliminare matematicamente.
+\end{itemize}
+L'obiettivo di ogni algoritmo è trovare il punto di \textbf{Tradeoff} ottimo: la giusta complessità in cui la somma di Bias e Varianza è minima, garantendo la miglior capacità di \textit{generalizzazione} sui dati mai visti.
+
+\section{La Maledizione della Dimensionalità (Curse of Dimensionality)}
+Aggiungere più informazioni (features) non sempre migliora il modello, ma può renderlo meno efficiente.
+Questo paradosso è noto come \textit{Fenomeno di Hughes}: a parità di numero di campioni di training, aumentando le features (le dimensioni dello spazio) le prestazioni prima salgono, ma poi crollano drasticamente.
+
+\paragraph{I Problemi principali:}
+\begin{itemize}
+    \item \textbf{Sparsità dei dati:} In spazi ad altissima dimensione, i punti (i campioni) sono isolati e lontanissimi tra loro.
+    Per mantenere una buona densità servirebbe un numero di dati che cresce in modo \textit{esponenziale}.
+    \item \textbf{Perdita di significato della distanza:} In algoritmi basati sulle distanze (es.
+    k-NN o Clustering), all'aumentare delle dimensioni la distanza tra il punto "più vicino" e quello "più lontano" tende ad azzerarsi.
+    Tutto diventa \textit{equidistante} e l'algoritmo non riesce più a distinguere le classi.
+\end{itemize}
+Per risolvere questo problema bisogna diminuire le features applicando tecniche di \textbf{Riduzione della Dimensionalità} (es. PCA, che comprime le features in un nuovo spazio più piccolo perdendo poca informazione) o di \textbf{Feature Selection} (come visto con la Matrice di Correlazione).
