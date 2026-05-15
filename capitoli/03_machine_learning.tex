@@ -63,17 +63,25 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
 
     \item \textbf{k-Nearest Neighbors (kNN):} Algoritmo pigro (\textit{lazy learner}) che classifica un nuovo punto analizzando la classe maggioritaria espressa dai suoi $k$ vicini più prossimi (usando distanze come l'Euclidea). Lo spazio può essere rappresentato da \textbf{Diagrammi di Voronoi}.
     \begin{itemize}
-        \item \textbf{Effetto di K:} Un $K$ molto piccolo porta a modelli ipersensibili (\emph{Overfitting}, confini rumorosi); un $K$ troppo grande appiattisce il giudizio (\emph{Underfitting}).
-        \item \textbf{Normalizzazione:} Cruciale affinché nessuna feature domini il calcolo della distanza a causa della sua scala. Si usano tecniche come Min-Max scaling o Z-score (\textit{Standardization}).
+        \item \textbf{Effetto di K:} Un $K$ molto piccolo (es. $K=1$) porta a confini di decisione frastagliati, imparando il rumore e causando \textbf{Overfitting}. All'aumentare di $K$ i confini diventano più lisci e il modello più resistente al rumore. Un $K$ troppo grande porta però a \textbf{Underfitting}.
+        \item \textbf{Normalizzazione:} È un passaggio obbligatorio.
+        Poiché il k-NN calcola la distanza euclidea tra i punti, se una feature (es.
+        battito cardiaco, $40-100$ bpm) ha un range molto più ampio di un'altra (es.
+        concentrazione, $0.0-1.0$), la prima dominerà matematicamente il calcolo.
+        Si scala tutto (es.
+        Z-score) per dare a tutte le feature la stessa importanza.
     \end{itemize}
 
-    \item \textbf{Support Vector Machines (SVM):} Modello ampiamente usato nel dominio biomedico per via della capacità di generalizzare in modo robusto in alti spazi dimensionali. Esegue la ricerca dell'iperpiano di separazione che massimizza il margine di distanza dai campioni.
+    \item \textbf{Support Vector Machines (SVM):} Modello ampiamente usato nel dominio biomedico per via della capacità di generalizzare in modo robusto in alti spazi dimensionali.
+    Esegue la ricerca dell'iperpiano di separazione che massimizza il margine di distanza dai campioni.
     Matematicamente l'iperpiano è definito da:
     \begin{equation}
         w \cdot x + b = 0
     \end{equation}
-    Il margine separatore tra le classi corrisponde a $\frac{2}{||w||}$. Per massimizzarlo si ricorre all'ottimizzazione convessa.
-    Nella realtà le classi non sono mai perfettamente separabili. Si introducono le \textbf{Variabili Slack} ($\xi$) per tollerare misclassificazioni, regolate dal parametro $C$ (\textit{Soft Margin}): un $C$ grande impone confini severi, abbassando gli errori sui dati di training ma alzando il rischio di overfitting. Un $C$ piccolo permette un margine più ampio e tollera più errori, migliorando la generalizzazione.
+    Il margine separatore tra le classi corrisponde a $\frac{2}{||w||}$.
+    Per massimizzarlo si ricorre all'ottimizzazione convessa.
+    Nella realtà le classi non sono mai perfettamente separabili.
+    Si introducono le \textbf{Variabili Slack} ($\xi$) per tollerare misclassificazioni, regolate dal parametro $C$ (\textit{Soft Margin}): un $C$ grande impone confini severi, abbassando gli errori sui dati di training ma alzando il rischio di overfitting. Un $C$ piccolo permette un margine più ampio e tollera più errori, migliorando la generalizzazione.
     Infine, si sfrutta il \textbf{Kernel Trick} (es. Polinomiale, RBF - Radial Basis Function) per mappare implicitamente e a basso costo computazionale le feature in uno spazio dimensionale superiore per superare la non-linearità.
 
     \begin{figure}[h!]
@@ -95,6 +103,16 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
         \end{tikzpicture}
         \caption{Rappresentazione concettuale di una SVM lineare bidimensionale. Sono evidenziati i vettori di supporto e le equazioni degli iperpiani corrispondenti al margine massimo.}
     \end{figure}
+
+    \paragraph{Parametro C e Kernel (Domande d'esame)}
+    \begin{itemize}
+        \item \textbf{Parametro di Penalità $C$ (Soft Margin):}
+        \begin{itemize}
+            \item $C$ molto grande ($C \to \infty$): Il modello punisce severamente gli errori. Il margine si stringe per classificare correttamente ogni singolo punto. Rischio: \textbf{Overfitting}.
+            \item $C$ piccolo: Il modello tollera le misclassificazioni. Margine più largo, confini più morbidi. Migliore \textbf{Generalizzazione}.
+        \end{itemize}
+        \item \textbf{I Dati Circolari e il Kernel:} Se una classe forma un anello attorno a un'altra classe (dati non separabili linearmente), si usa un \textbf{Kernel RBF (Gaussiano)} o Polinomiale. Il Kernel proietta i dati in un nuovo spazio a più dimensioni dove diventano separabili da un iperpiano piatto.
+    \end{itemize}
 
     \item \textbf{Logistic Regression (Regressione Logistica):} Algoritmo parametrico che restituisce, tramite la \textbf{funzione Sigmoide} $\sigma(z) = \frac{1}{1 + e^{-z}}$, la probabilità di appartenenza a una classe (da 0 a 1). La funzione di costo (\textbf{Loss}) è la Log-Loss (o Cross-Entropy), la quale è matematicamente garantita essere \textbf{convessa}: questo assicura che l'algoritmo di ottimizzazione tramite iterazioni di \textbf{Discesa del Gradiente} convergerà sempre a un unico minimo globale ottimale, senza impantanarsi in minimi locali.
 
@@ -125,8 +143,9 @@ Per quantificare l'efficienza degli algoritmi di classificazione, ci si affida s
 \begin{itemize}
     \item \textbf{Accuracy (Accuratezza):} Percentuale di predizioni corrette totali, calcolata come $\frac{TP + TN}{TP + TN + FP + FN}$. Può essere ingannevole se il dataset è sbilanciato.
     \item \textbf{Precision (Precisione):} Rapporto dei positivi previsti in modo corretto sui positivi totali predetti $\frac{TP}{TP + FP}$.
-    \item \textbf{Recall (Sensibilità):} Rapporto dei positivi individuati sul totale dei positivi reali $\frac{TP}{TP + FN}$. Utile in ambito medico per minimizzare i falsi negativi.
-    \item \textbf{F1-Score:} Media armonica pesata di Precision e Recall.
+    \item \textbf{Recall (Sensibilità):} $\frac{TP}{TP + FN}$.
+    In un sistema di \textbf{diagnosi medica} (es. malattia grave), il nostro obiettivo primario è ridurre a zero i Falsi Negativi (malati classificati come sani e mandati a casa). In questi scenari si deve massimizzare la Recall, accettando magari qualche Falso Positivo (FP) in più.
+    \item \textbf{F1-Score:} È la metrica da preferire all'Accuracy quando il dataset è \textbf{fortemente sbilanciato} (es. rilevare un malware che colpisce 1 PC su 1000).
 \end{itemize}
 
 \section{Gestione dei Dati (Input Analysis) ed Estrazione Features}

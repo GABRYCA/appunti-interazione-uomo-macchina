@@ -119,6 +119,14 @@ Matematicamente, per caratterizzare un segnale valuto:
     \\ Discreto: $\displaystyle P = \lim_{N \to \infty} \frac{1}{2N+1} \sum_{n=-N}^{N} |x[n]|^2$
 \end{itemize}
 
+\paragraph{Caso d'esame: Segnale Sinusoidale}
+Dato un segnale sinusoidale $x(t) = A \cos(2\pi f t + \phi)$ esteso su tutto l'asse temporale ($-\infty < t < +\infty$):
+\begin{itemize}
+    \item \textbf{Energia (E):} È sempre \textbf{Infinita} ($\infty$), poiché l'integrale di una funzione periodica su tempo infinito diverge.
+    \item \textbf{Potenza (P):} È \textbf{Finita} e vale sempre $P = \frac{A^2}{2}$.
+    \item \textit{Nota bene:} La potenza media di una sinusoide \textbf{non dipende dalla frequenza} o dalla fase. Se la frequenza raddoppia, la potenza rimane invariata!
+\end{itemize}
+
 Il \textbf{SNR (Signal-to-Noise Ratio)} è la metrica principale per definire la pulizia di un segnale rispetto ai disturbi acquisiti dai sensori o creati dai circuiti:
 \begin{equation}
     SNR_{dB} = 10 \log_{10} \left( \frac{P_{seg}}{P_{rum}} \right)
@@ -199,3 +207,27 @@ Per pulire i segnali vengono adoperati vari filtri di elaborazione del segnale d
     \caption{Tabella comparativa: Filtro Media vs Filtro Mediano.}
 \end{table}
 \vspace{0.5cm}
+
+\paragraph{Scelta dei Filtri nella pratica clinica (ECG/EDA)}
+Nelle interfacce fisiologiche, ogni rumore ha un filtro specifico ideale:
+\vspace{0.3cm}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|p{4.5cm}|p{5.5cm}|p{4cm}|}
+        \hline
+        \textbf{Problema / Artefatto} & \textbf{Causa} & \textbf{Soluzione} \\
+        \hline
+        \textbf{Deriva linea di base (Drift)} & Respiro, sudorazione lenta (SCL), movimento cavi. & \textbf{Filtro Passa-Alto} (es. taglio a $0.5$ Hz) o \texttt{detrend}. \\
+        \hline
+        \textbf{Rumore di Rete (Ronzio)} & Cavi elettrici nella stanza, interferenza. & \textbf{Filtro Notch} (Arresta-banda) centrato a $50$ Hz. \\
+        \hline
+        \textbf{Rumore Muscolare (EMG)} & Contrazioni muscolari ad alta frequenza sovrapposte. & \textbf{Filtro Passa-Basso} (es. taglio a $25-40$ Hz). \\
+        \hline
+        \textbf{Spike improvvisi} & Urto dell'elettrodo, disconnessione rapida. & \textbf{Filtro Mediano} (scarta l'outlier senza spalmarlo). \\
+        \hline
+        \textbf{Effetto "Ringing"} & Ordine del filtro (es. Butterworth) troppo elevato su transizioni rapide. & Abbassare l'ordine del filtro. \\
+        \hline
+    \end{tabular}
+    \caption{Guida pratica alla scelta dei filtri per segnali bioelettrici.}
+\end{table}
+\vspace{0.3cm}

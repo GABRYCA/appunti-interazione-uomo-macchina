@@ -80,3 +80,52 @@ Questo perché il dataset è estremamente sbilanciato (Class Imbalance): i veri 
 Se un classificatore dicesse sempre "Non Spam", avrebbe un accuracy di $\frac{960}{1005} = 95.5\%$, pur non avendo capacità predittiva.
 In questi casi, F1-Score e Recall sono metriche più significative.
 
+\section{Esercizio Tipo 5: Energia e Potenza di una Sinusoide}
+\textbf{Testo:} Un segnale $x(t) = 10 \cos(2\pi f t)$ viene osservato su un singolo periodo $T$.
+Qual è l'energia $E$ contenuta in quel periodo?
+Se la frequenza raddoppia, cosa succede alla potenza media su tempo infinito?
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+\begin{enumerate}
+    \item L'energia su un singolo periodo per una sinusoide di ampiezza $A$ è data dall'integrale del quadrato, che equivale a $E_{periodo} = \frac{A^2}{2} \cdot T$. Sostituendo $A=10$, otteniamo $E = \frac{100}{2}T = 50 T$.
+    \item La potenza media teorica di una sinusoide su tempo infinito dipende \textit{solo} dall'ampiezza ed è $P = \frac{A^2}{2}$.
+    Essendo indipendente da $f$, se la frequenza raddoppia, \textbf{la potenza rimane invariata}.
+\end{enumerate}
+
+\section{Esercizio Tipo 6: Filtraggio di Segnali Fisiologici}
+\textbf{Testo:} Stai analizzando un segnale EDA/GSR. Il soggetto tocca accidentalmente l'elettrodo per un millisecondo, creando un picco stretto e altissimo (artefatto impulsivo).
+Vuoi estrarre la linea di base (SCL) senza distorcerla.
+Hai a disposizione un filtro di media mobile e un filtro mediano.
+Qual è la strategia/sequenza corretta?
+
+\vspace{0.5cm}
+\textbf{Risoluzione:}
+La sequenza corretta è: \textbf{Prima Filtro Mediano, poi Filtro di Media (o estrazione del trend)}.
+\textit{Motivazione:} L'artefatto impulsivo (outlier) verrebbe "spalmato" da un filtro di media, inquinando temporalmente il segnale SCL.
+Applicando prima un filtro non-lineare (Mediano), il picco anomalo viene scartato completamente.
+A quel punto, sul segnale pulito, si può applicare un filtro passa-basso (media) per estrarre la linea di base.
+
+\section{Esercizio Tipo 7: Domande Teoriche di Machine Learning}
+
+\textbf{Domanda 1:} In un classificatore Random Forest, perché le performance sono solitamente migliori di un singolo Decision Tree?
+
+\vspace{0.25cm}
+\textit{Risposta:} Perché essendo un algoritmo \textit{Ensemble}, combina molti alberi diversi addestrati su sottoinsiemi randomici di dati e feature.
+Questo approccio basato sul voto a maggioranza \textbf{riduce la varianza} complessiva del modello e previene l'Overfitting tipico dei singoli alberi decisionali, che tendono ad imparare il rumore.
+
+\vspace{0.5cm}
+\textbf{Domanda 2:} Hai un dataset a forma di cerchio: i punti della classe A sono al centro, i punti della classe B formano un anello esterno.
+Come procedi con una SVM?
+
+\vspace{0.25cm}
+\textit{Risposta:} Un iperpiano lineare non può separare le classi.
+Devo usare un \textbf{Kernel RBF (Gaussiano)} o Polinomiale.
+Il kernel proietta (trasforma) i dati in un nuovo spazio matematico a più dimensioni, rendendo le due distribuzioni linearmente separabili in quella nuova dimensionalità.
+
+\vspace{0.5cm}
+\textbf{Domanda 3:} Cosa indica il fenomeno dell'Overfitting in termini di Bias e Varianza?
+
+\vspace{0.25cm}
+\textit{Risposta:} L'Overfitting si manifesta con \textbf{Basso Bias e Alta Varianza}.
+Il modello è talmente complesso che cattura perfettamente i dati di training (incluso il loro rumore casuale), ma diventa ipersensibile alle fluttuazioni, fallendo sui nuovi dati di test.
