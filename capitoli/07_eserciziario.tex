@@ -129,3 +129,124 @@ Il kernel proietta (trasforma) i dati in un nuovo spazio matematico a più dimen
 \vspace{0.25cm}
 \textit{Risposta:} L'Overfitting si manifesta con \textbf{Basso Bias e Alta Varianza}.
 Il modello è talmente complesso che cattura perfettamente i dati di training (incluso il loro rumore casuale), ma diventa ipersensibile alle fluttuazioni, fallendo sui nuovi dati di test.
+
+\section{Esercizi Tipo 8: Campionamento e Quantizzazione (Multiple Choice \& Calcoli)}
+
+\subsection{Esercizi Numerici a risposta aperta}
+
+\textbf{Esercizio 1} \\
+\textit{Un sensore cattura un segnale analogico la cui componente di frequenza più alta è 12 kHz. Il segnale deve essere digitalizzato garantendo un Rapporto Segnale-Rumore (SNR) di almeno 40 dB.}
+
+\begin{enumerate}
+    \item[\textbf{a.}] \textbf{Qual è la frequenza di campionamento minima?} \\
+    Per il Teorema di Nyquist, per non perdere informazioni:
+    $$f_s \ge 2 \cdot f_{max} \implies f_s = 2 \cdot 12 \text{ kHz} = \mathbf{24 \text{ kHz}}$$
+
+    \item[\textbf{b.}] \textbf{Quanti bit di quantizzazione servono? (Usa la formula empirica dB)} \\
+    La formula empirica per l'errore di quantizzazione (SQNR) è:
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, fill=yellow!10, rounded corners, inner sep=10pt] {
+                $SNR_{dB} \approx 6.02 \cdot n + 1.76$
+            };
+        \end{tikzpicture}
+    \end{center}
+    Sostituendo 40 dB:
+    $$40 = 6.02 \cdot n + 1.76 \implies 6.02 \cdot n = 38.24 \implies n = \frac{38.24}{6.02} \approx 6.35$$
+    Poiché i bit devono essere interi, arrotondiamo per eccesso per garantire \textit{almeno} 40 dB: \textbf{7 bit}.
+
+    \item[\textbf{c.}] \textbf{Qual è il bitrate risultante?} \\
+    Il bitrate $R$ (bit per secondo) si calcola moltiplicando i campioni al secondo per i bit per campione:
+    $$R = f_s \cdot n = 24.000 \text{ Hz} \cdot 7 \text{ bit} = 168.000 \text{ bps} = \mathbf{168 \text{ kbps}}$$
+\end{enumerate}
+
+\vspace{0.5cm}
+
+\textbf{Esercizio 2} \\
+\textit{Considera un convertitore Analogico-Digitale (ADC) a 8 bit che lavora in un range di tensione da 0V a 5V.}
+
+\begin{enumerate}
+    \item[\textbf{a.}] \textbf{Quanti sono i livelli di quantizzazione?} \\
+    $$L = 2^n = 2^8 = \mathbf{256 \text{ livelli}}$$
+
+    \item[\textbf{b.}] \textbf{Qual è la risoluzione (o "passo di quantizzazione")?} \\
+    La risoluzione $\Delta$ indica i Volt coperti da un singolo gradino. Per coprire esattamente gli estremi si divide per $L-1$:
+    $$\Delta = \frac{V_{max} - V_{min}}{L - 1} = \frac{5 - 0}{255} = 0.0196 \text{ V} = \mathbf{19.6 \text{ mV}}$$
+
+    \item[\textbf{c.}] \textbf{Se il segnale in ingresso è di 2.15V, quale sarà il valore intero (livello) associato?} \\
+    Si divide il valore analogico per il passo $\Delta$ e si arrotonda:
+    $$Livello = \text{round}\left( \frac{2.15}{0.0196} \right) = \text{round}(109.69) = \mathbf{110}$$
+\end{enumerate}
+
+\subsection{Esercizi a Risposta Multipla: Ragionamento}
+
+\begin{itemize}
+    \item \textbf{3) Qual è lo scopo principale della quantizzazione nel processo di conversione analogico digitale?} \\
+    \textbf{Risposta: D.} Mappare un insieme infinito di valori di ampiezza in un insieme finito di livelli discreti. \textit{(Mentre il campionamento discretizza il TEMPO, la quantizzazione discretizza l'AMPIEZZA).}
+
+    \item \textbf{4) In un quantizzatore uniforme, se l'intervallo dinamico del segnale è di 10 V e abbiamo
+    1024 livelli, quanto vale approssimativamente l'ampiezza di ogni gradino?} \\
+    \textbf{Risposta: C (Circa 10 mV).} \\
+    $\Delta = 10 / 1024 \approx 0.0097$ V, ovvero circa 10 mV.
+
+    \item \textbf{5) Cosa succede al rapporto segnale-rumore di quantizzazione (SQNR) se aumentiamo il
+    numero di bit di risoluzione?} \\
+    \textbf{Risposta: C.} Aumenta, migliorando la fedeltà del segnale rispetto al rumore. \textit{(Ricorda la formula: ogni bit in più aggiunge circa $\sim 6$ dB al rapporto segnale-rumore).}
+
+    \item \textbf{6) Qual è il valore massimo dell'errore di quantizzazione in un quantizzatore uniforme con
+    ampiezza del gradino $\Delta$?} \\
+    \textbf{Risposta: D ($\pm \Delta / 2$).} L'errore massimo si ha quando il valore analogico cade esattamente a metà tra due gradini.
+
+    \item \textbf{7) Aumentare la risoluzione da 8 bit a 16 bit in un segnale audio cosa comporta principalmente?} \\
+    \textbf{Risposta: B.} Una riduzione del rumore di quantizzazione. \textit{(La massima frequenza registrabile dipende dalla frequenza di campionamento $f_s$, non dai bit!)}
+
+    \item \textbf{8) Se un segnale ha una frequenza massima di 15 kHz e viene campionato a 20kHz, quale
+    fenomeno si verifica?} \\
+    \textbf{Risposta: B (Aliasing).} \\
+    Nyquist richiede $f_s > 2 \cdot 15 = 30$ kHz. Avendo campionato solo a 20 kHz, si ha aliasing (frequenze fantasma o fold-over).
+
+    \item \textbf{9) Di quanti decibel migliora il rapporto segnale-rumore se aumentiamo la risoluzione di 2 bit?} \\
+    \textbf{Risposta: A (Circa 12 dB).} \\
+    Ogni bit fornisce $\approx 6.02$ dB. Due bit forniscono $2 \cdot 6.02 \approx 12$ dB.
+
+    \item \textbf{10) Il ‘dither' viene utilizzato per:} \\
+    \textbf{Risposta: C.} Rompere la correlazione tra l'errore di quantizzazione e il segnale originale. \textit{(Aggiungendo rumore bianco prima di quantizzare, l'errore non segue più le forme d'onda della musica, risultando molto meno fastidioso all'orecchio umano).}
+
+    \item \textbf{11) Il rumore di quantizzazione diminuisce se:} \\
+    \textbf{Risposta: C.} Si aumenta il numero di bit del quantizzatore.
+
+    \item \textbf{12) Se raddoppiamo il numero di bit di un quantizzatore da 8 a 16 bit , cosa succede al numero
+    di livelli?} \\
+    \textbf{Risposta: D.} Aumenta di 256 volte. \\
+    Dimostrazione: Livelli a 8 bit = $2^8 = 256$. Livelli a 16 bit = $2^{16} = 65536$. Il rapporto è $\frac{65536}{256} = 256$.
+\end{itemize}
+
+\subsection{Esercizi Energia e Potenza su Sinusoidi}
+
+Questi tre concetti sono fondamentali e spesso motivo di tranelli all'esame:
+
+\begin{center}
+    \begin{tikzpicture}
+        \node[draw, fill=blue!5, rounded corners, inner sep=10pt, text width=12cm] {
+            \textbf{Regole d'oro della Sinusoide $x(t) = A \cos(2\pi f t)$:}
+            \begin{itemize}
+                \item \textbf{Tempo infinito:} L'Energia è sempre $\infty$. La Potenza media è finita e vale \textbf{$P = A^2 / 2$}.
+                \item \textbf{Singolo Periodo $T$:} L'Energia in un periodo è $E_T = \frac{A^2}{2} \cdot T$.
+                \item \textbf{Frequenza:} La potenza media dipende SOLO dall'ampiezza. \textbf{Se $f$ varia, la Potenza resta invariata.}
+            \end{itemize}
+        };
+    \end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{13) Dato un segnale sinusoidale $x(t) = A \cos(2\pi f t)$ definito da $-\infty$ $\infty$, come viene classificato in termini di energia e potenza?} \\
+    \textbf{Risposta: C.} Energia infinita e Potenza finita (è il classico "segnale di potenza").
+
+    \item \textbf{14) Un segnale $x(t) = 10 \cos(2\pi f t)$ viene osservato solo per un singolo periodo $T$. Qual è l'energia E contenuta in quel periodo?} \\
+    \textbf{Risposta: A (50 T).} \\
+    Calcolo: $E = \int_0^T x(t)^2 dt = \frac{A^2}{2} \cdot T = \frac{100}{2} \cdot T = 50T$.
+
+    \item \textbf{15)} Dato il segnale $x(t) = A \cos(2\pi f t)$, se la frequenza $f$ raddoppia, cosa succede alla potenza media? \\
+    \textbf{Risposta: C.} Rimane invariata.
+    La formula della potenza $P = A^2/2$ non ha la frequenza tra i suoi parametri!
+\end{itemize}
