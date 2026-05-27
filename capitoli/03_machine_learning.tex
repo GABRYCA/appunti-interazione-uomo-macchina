@@ -141,11 +141,15 @@ Il corso affronta diversi approcci algoritmici classici per affrontare il task d
 \section{Metriche di Valutazione}
 Per quantificare l'efficienza degli algoritmi di classificazione, ci si affida sovente all'uso della \textbf{Matrice di Confusione}, che espone i True Positive (TP), True Negative (TN), False Positive (FP) e False Negative (FN). Da questa matrice si ricavano formule essenziali:
 \begin{itemize}
-    \item \textbf{Accuracy (Accuratezza):} Percentuale di predizioni corrette totali, calcolata come $\frac{TP + TN}{TP + TN + FP + FN}$. Può essere ingannevole se il dataset è sbilanciato.
+    \item \textbf{Accuracy (Accuratezza):} Percentuale di predizioni corrette totali, calcolata come $\frac{TP + TN}{TP + TN + FP + FN}$.
+    Può essere ingannevole se il dataset è sbilanciato.
     \item \textbf{Precision (Precisione):} Rapporto dei positivi previsti in modo corretto sui positivi totali predetti $\frac{TP}{TP + FP}$.
     \item \textbf{Recall (Sensibilità):} $\frac{TP}{TP + FN}$.
-    In un sistema di \textbf{diagnosi medica} (es. malattia grave), il nostro obiettivo primario è ridurre a zero i Falsi Negativi (malati classificati come sani e mandati a casa). In questi scenari si deve massimizzare la Recall, accettando magari qualche Falso Positivo (FP) in più.
-    \item \textbf{F1-Score:} È la metrica da preferire all'Accuracy quando il dataset è \textbf{fortemente sbilanciato} (es. rilevare un malware che colpisce 1 PC su 1000).
+    In un sistema di \textbf{diagnosi medica} (es. malattia grave), il nostro obiettivo primario è ridurre a zero i Falsi Negativi (malati classificati come sani e mandati a casa).
+    In questi scenari si deve massimizzare la Recall, accettando magari qualche Falso Positivo (FP) in più.
+    \item \textbf{F1-Score:} Media armonica di Precision e Recall, calcolata come:
+    $2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$ (oppure $\frac{2 \cdot TP}{2 \cdot TP + FP + FN}$).
+    È la metrica da preferire all'Accuracy quando il dataset è \textbf{fortemente sbilanciato} (es. rilevare un malware che colpisce 1 PC su 1000).
 \end{itemize}
 
 \section{Gestione dei Dati (Input Analysis) ed Estrazione Features}
