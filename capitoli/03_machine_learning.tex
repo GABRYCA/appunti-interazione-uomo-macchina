@@ -37,7 +37,8 @@ Oltre un certo limite si verifica il \textbf{Fenomeno di Hughes}:
 Per ridurre l'alta dimensionalità si usano due approcci:
 \begin{itemize}
     \item \textbf{Feature Extraction (es. PCA):} Trasforma le variabili originali creandone di nuove (in numero minore) che riassumono la maggior quantità di informazione (varianza) possibile.
-    \item \textbf{Feature Selection:} Seleziona solo un sottoinsieme delle variabili originali più utili. Ad esempio, calcolando la \textbf{Correlazione di Pearson}, si eliminano le feature troppo simili tra loro (valori vicini a 1 o -1), riducendo la ridondanza.
+    \item \textbf{Feature Selection:} Seleziona solo un sottoinsieme delle variabili originali più utili.
+    Ad esempio, calcolando la \textbf{Correlazione di Pearson}, si eliminano le feature troppo simili tra loro (valori vicini a 1 o -1), riducendo la ridondanza.
 \end{itemize}
 
 \subsection{Normalizzazione}
@@ -46,6 +47,23 @@ Molto importante, specialmente per i classificatori che si basano sulle distanze
     \item \textbf{Min-Max Scaling:} Conduce forzatamente tutti i valori in un range prestabilito, normamente $[0, 1]$.
     \item \textbf{Standardization (Z-Score):} Impone che le proiezioni campionarie abbiano una media statistica di "zero" e una varianza "unitaria", riadattando il \textit{range} secondo la deviazione standard del set: $\displaystyle z = \frac{x - \mu}{\sigma}$.
 \end{itemize}
+
+\vspace{0.3cm}
+\noindent
+\fcolorbox{black}{yellow!10}{
+    \begin{minipage}{\linewidth}
+        \textbf{Attenzione: Procedura corretta di Normalizzazione} \\
+        La normalizzazione NON deve mai essere applicata all'intero dataset prima della divisione in Training e Test.
+        La pipeline corretta prevede:
+        \begin{enumerate}
+            \item \textbf{Split:} Dividere i dati in Train e Test.
+            \item \textbf{Fit:} Calcolare i parametri (es. Min e Max, o Media e Varianza) \emph{esclusivamente} sul Training set.
+            \item \textbf{Transform:} Applicare la formula di normalizzazione al Training set e, utilizzando gli stessi identici parametri appena calcolati, normalizzare anche il Test set.
+        \end{enumerate}
+        Questo impedisce al modello di "sbirciare" (Data Leakage) la distribuzione dei dati futuri.
+    \end{minipage}
+}
+\vspace{0.3cm}
 
 \section{Validazione del Modello}
 Nel panorama dei segnali fisiologici, in continua variazione soggettiva nel tempo, il classico random-split in "Train" e "Test" (\textit{Holdout Method}) può portare a conclusioni gravemente ingannevoli.
@@ -62,10 +80,15 @@ Nel panorama dei segnali fisiologici, in continua variazione soggettiva nel temp
 \end{itemize}
 
 \subsection{Data Leakage}
-Il \textbf{Data Leakage} (Fuga di dati) avviene quando informazioni del set di \textit{Test} finiscono accidentalmente nel set di \textit{Training}.
-Nei segnali continui (es.
-EEG) questo accade spesso se si estraggono finestre temporali sovrapposte (overlapping).
-In questo caso, Training e Test conterranno dati quasi identici: il modello sembrerà perfetto in fase di test, ma in realtà starà facendo \textbf{Overfitting}.
+Il \textbf{Data Leakage} (Fuga di dati) avviene quando informazioni del set di \textit{Test} finiscono accidentalmente nel set di \textit{Training}. Questo porta il modello a sembrare perfetto in fase di validazione, ma a fare \textbf{Overfitting} e fallire miseramente su dati reali.
+
+Nei segnali fisiologici, i due casi più comuni di Data Leakage sono:
+\begin{itemize}
+    \item \textbf{Normalizzazione pre-split:} Calcolare il Min/Max o la Media globale sull'intero dataset \textit{prima} di dividerlo. Così facendo, le metriche del Test set influenzano la scalatura dei dati di addestramento.
+    \item \textbf{Finestre temporali sovrapposte (Overlapping):} Estrarre finestre da un segnale continuo (es. EEG) con elevato overlap e fare uno split casuale (random holdout). È altissima la probabilità che finestre quasi identiche finiscano in parte nel Train e in parte nel Test.
+\end{itemize}
+
+\subsection{Metriche di Valutazione}
 
 \begin{enumerate}
     \item \textbf{Accuracy (Accuratezza):} Percentuale di previsioni corrette sul totale.
@@ -79,12 +102,14 @@ In questo caso, Training e Test conterranno dati quasi identici: il modello semb
         Precision = \frac{TP}{TP + FP}
     \end{equation}
 
-    \item \textbf{Recall (Sensibilità o TPR):} Quanti positivi reali sono stati individuati correttamente? Minimizza i Falsi Negativi, fondamentale in ambito medico.
+    \item \textbf{Recall (Sensibilità o TPR):} Quanti positivi reali sono stati individuati correttamente?
+    Minimizza i Falsi Negativi, fondamentale in ambito medico.
     \begin{equation}
         Recall = \frac{TP}{TP + FN}
     \end{equation}
 
-    \item \textbf{F1-Score:} Media armonica tra Precision e Recall. È la metrica ideale per dataset sbilanciati.
+    \item \textbf{F1-Score:} Media armonica tra Precision e Recall.
+    È la metrica ideale per dataset sbilanciati.
     \begin{equation}
         F1 = 2 \cdot \frac{Precision \cdot Recall}{Precision + Recall}
     \end{equation}
@@ -94,28 +119,35 @@ In questo caso, Training e Test conterranno dati quasi identici: il modello semb
 \section{Algoritmi Principali di Classificazione}
 
 \subsection{K-Nearest Neighbors (k-NN)}
-Algoritmo \textit{non parametrico} e \textit{lazy learner}: non ha una vera fase di addestramento. A runtime, classifica un nuovo dato assegnandogli la classe maggioritaria tra i suoi "$K$ vicini" più prossimi nello spazio delle feature.
+Algoritmo \textit{non parametrico} e \textit{lazy learner}: non ha una vera fase di addestramento.
+A runtime, classifica un nuovo dato assegnandogli la classe maggioritaria tra i suoi "$K$ vicini" più prossimi nello spazio delle feature.
 \begin{itemize}
     \item \textbf{Scelta di K}: Un $K$ troppo piccolo ($K=1$) modella eccessivamente il rumore (\textbf{Overfitting}). Aumentando $K$, i confini decisionali diventano più lisci (\textbf{Generalizzazione}). Un $K$ troppo grande porta a \textbf{Underfitting}.
 \end{itemize}
 
 \subsection{Decision Trees e Random Forest}
-\textbf{Decision Trees (Alberi Decisionali)}: Classifica i dati creando regole binarie a cascata sulle \textit{feature}. Ad ogni snodo, sceglie la regola che minimizza l'\textit{Impurità} dei dati, calcolata ad esempio con:
+\textbf{Decision Trees (Alberi Decisionali)}: Classifica i dati creando regole binarie a cascata sulle \textit{feature}.
+Ad ogni snodo, sceglie la regola che minimizza l'\textit{Impurità} dei dati, calcolata ad esempio con:
 \begin{equation}
     Indice\ di\ Gini = 1 - \sum_{i} (p_i)^2
 \end{equation}
 Il limite principale dell'Albero singolo è la forte tendenza all'\textbf{Overfitting}.
 
-\textbf{Random Forest}: Usa l'\textbf{Ensemble Learning} (\textit{Bagging}) per risolvere l'overfitting dei Decision Trees. Addestra numerosi alberi decisionali su sottoinsiemi casuali di dati e di feature. La classificazione finale avviene per \textbf{Majority Voting} (maggioranza), garantendo stabilità e alta precisione.
+\textbf{Random Forest}: Usa l'\textbf{Ensemble Learning} (\textit{Bagging}) per risolvere l'overfitting dei Decision Trees.
+Addestra numerosi alberi decisionali su sottoinsiemi casuali di dati e di feature.
+La classificazione finale avviene per \textbf{Majority Voting} (maggioranza), garantendo stabilità e alta precisione.
 
 \subsection{Support Vector Machines (SVM)}
-Cerca l'\textbf{Iperpiano} (un asse o piano di separazione) che divida in modo ottimale due classi, massimizzando il \textbf{Margine} di distanza tra esse. I campioni più vicini all'iperpiano sono detti \textit{Support Vectors}.
+Cerca l'\textbf{Iperpiano} (un asse o piano di separazione) che divida in modo ottimale due classi, massimizzando il \textbf{Margine} di distanza tra esse.
+I campioni più vicini all'iperpiano sono detti \textit{Support Vectors}.
 \begin{equation}
     w \cdot x + b = 0 \quad \text{(Equazione dell'Iperpiano lineare, margine $\frac{2}{||w||}$)}
 \end{equation}
 \begin{itemize}
     \item \textbf{Soft Margin (Parametro C):} Per dataset non perfettamente separabili, si ammette un certo margine di errore. Il parametro \textbf{$C$} regola questo compromesso: un $C$ alto penalizza duramente gli errori (\textit{Overfitting}), un $C$ basso tollera qualche errore per favorire un margine più ampio (\textit{Generalizzazione}).
-    \item \textbf{Kernel Trick:} Permette di applicare la SVM a problemi \textbf{non lineari}. Mappa i dati in uno spazio a dimensioni superiori tramite funzioni matematiche (es. Kernel Lineare, Polinomiale, RBF) dove i dati diventano separabili linearmente, senza pesare eccessivamente sui calcoli.
+    \item \textbf{Kernel Trick:} Permette di applicare la SVM a problemi \textbf{non lineari}.
+    Mappa i dati in uno spazio a dimensioni superiori tramite funzioni matematiche (es.
+    Kernel Lineare, Polinomiale, RBF) dove i dati diventano separabili linearmente, senza pesare eccessivamente sui calcoli.
 \end{itemize}
 
 \vspace{0.5cm}
@@ -145,4 +177,5 @@ Nasce per la regressione ma è un ottimo classificatore binario (estendibile al 
     \sigma(z) = \frac{1}{1 + e^{-z}}
 \end{equation}
 Questo "schiaccia" il risultato in un intervallo $[0, 1]$, trasformandolo in una \textbf{probabilità}.
-Invece di usare l'errore quadratico medio, utilizza come funzione di costo la \textbf{Log-Loss (Cross-Entropy Loss)}. Essendo una funzione matematica convessa, garantisce che l'algoritmo di \textit{Discesa del Gradiente} trovi sempre il minimo globale, evitando di bloccarsi nei minimi locali.
+Invece di usare l'errore quadratico medio, utilizza come funzione di costo la \textbf{Log-Loss (Cross-Entropy Loss)}.
+Essendo una funzione matematica convessa, garantisce che l'algoritmo di \textit{Discesa del Gradiente} trovi sempre il minimo globale, evitando di bloccarsi nei minimi locali.

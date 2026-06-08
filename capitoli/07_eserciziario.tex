@@ -171,12 +171,30 @@ Il modello è talmente complesso che cattura perfettamente i dati di training (i
 
     \item[\textbf{b.}] \textbf{Qual è la risoluzione (o "passo di quantizzazione")?} \\
     La risoluzione $\Delta$ indica i Volt coperti da un singolo gradino. Per coprire esattamente gli estremi si divide per $L-1$:
-    $$\Delta = \frac{V_{max} - V_{min}}{L - 1} = \frac{5 - 0}{255} = 0.0196 \text{ V} = \mathbf{19.6 \text{ mV}}$$
+    $$\Delta = \frac{V_{max} - V_{min}}{L - 1} = \frac{5 - 0}{255} \approx 0.0196 \text{ V} = \mathbf{19.6 \text{ mV}}$$
 
     \item[\textbf{c.}] \textbf{Se il segnale in ingresso è di 2.15V, quale sarà il valore intero (livello) associato?} \\
-    Si divide il valore analogico per il passo $\Delta$ e si arrotonda:
-    $$Livello = \text{round}\left( \frac{2.15}{0.0196} \right) = \text{round}(109.69) = \mathbf{110}$$
+    Per calcolare il livello associato, è \textbf{fondamentale} calcolare la differenza tra il segnale in ingresso e la tensione minima di fondo scala ($V_{min}$), per poi dividere per il passo $\Delta$.
+    Questa formula generale garantisce il corretto funzionamento anche con segnali bipolari o con offset:
+    $$Livello = \text{round}\left( \frac{V_{in} - V_{min}}{\Delta} \right)$$
+
+    Nel nostro caso specifico ($V_{min} = 0\text{V}$):
+    $$Livello = \text{round}\left( \frac{2.15 - 0}{0.0196} \right) = \text{round}(109.69) = \mathbf{110}$$
 \end{enumerate}
+
+\vspace{0.5cm}
+\noindent
+\fcolorbox{black}{yellow!10}{
+    \begin{minipage}{\linewidth}
+        \textbf{Attenzione (Errore Comune):} Usare la formula semplificata $\text{round}(V_{in} / \Delta)$ funziona \textbf{solo} se $V_{min} = 0\text{V}$.
+
+        Se ad esempio avessimo avuto un ADC con range da $\mathbf{-5\text{V}}$ a $\mathbf{+5\text{V}}$ ($\Delta = \frac{10}{255} \approx 0.0392\text{V}$) e lo stesso ingresso di $2.15\text{V}$, il calcolo errato darebbe:
+        $$\text{round}\left(\frac{2.15}{0.0392}\right) = 55 \quad \text{\color{red}{(Sbagliato, manca fondoscala negativo!)}}$$
+
+        Il calcolo corretto applicando la formula generale è:
+        $$\text{round}\left(\frac{2.15 - (-5)}{0.0392}\right) = \text{round}\left(\frac{7.15}{0.0392}\right) = \mathbf{182} \quad \text{\color{green!50!black}{(Corretto!)}}$$
+    \end{minipage}
+}
 
 \subsection{Esercizi a Risposta Multipla: Ragionamento}
 
