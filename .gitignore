@@ -331,4 +331,5 @@ TSWLatexianTemp*
 #*Notes.bib
 
 /materiale/*
-/Progetto/*
+./Progetto/*
+/Progetto/
