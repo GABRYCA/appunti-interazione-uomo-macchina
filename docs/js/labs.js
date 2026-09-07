@@ -28,17 +28,32 @@
     const pts=[];
     for(let n=0;n<=ns;n++){ const t=n/fs; if(t>T) break; const y=Math.sin(2*Math.PI*f*t); pts.push([t,y]); const px=pad+t/T*W, py=(h-22)-((y+1)/2)*H; x.beginPath(); x.arc(px,py,3.4,0,7); x.fill(); }
     // alias ricostruito: f_alias = |f - round(f/fs)*fs|
-    const k=Math.round(f/fs), fa=Math.abs(f-k*fs);
+    // Nota: i campioni valgono sin(2π·f·n/fs) = sin(2π·(f-k·fs)·n/fs),
+    // quindi la sinusoide apparente deve usare la frequenza con segno
+    // fall = f-k·fs (non solo |fall|): sin è dispari, perciò se fall<0
+    // la ricostruzione è invertita (-sin(2π·fa·t)) e solo così passa
+    // esattamente per i punti campionati (cfr. figura LaTeX con -sin).
+    const k=Math.round(f/fs), fall=f-k*fs, fa=Math.abs(fall);
     const ok = fs > 2*f;
     if(!ok){
       x.setLineDash([6,4]); x.lineWidth=2; x.strokeStyle='#b42318'; x.beginPath();
-      for(let i=0;i<=N;i++){ const t=i/N*T, v=Math.sin(2*Math.PI*fa*t); const px=pad+i/N*W, py=(h-22)-((v+1)/2)*H; i?x.lineTo(px,py):x.moveTo(px,py); }
+      for(let i=0;i<=N;i++){ const t=i/N*T, v=Math.sin(2*Math.PI*fall*t); const px=pad+i/N*W, py=(h-22)-((v+1)/2)*H; i?x.lineTo(px,py):x.moveTo(px,py); }
       x.stroke(); x.setLineDash([]);
     }
+    // legenda colori (stessi colori delle curve)
+    try{
+      const inkA=((getComputedStyle(document.documentElement).getPropertyValue('--ink')||'#1b2a30').trim()||'#1b2a30');
+      x.font='11px system-ui'; x.lineWidth=2.5;
+      x.strokeStyle='#0f6f6a'; x.beginPath(); x.moveTo(pad+6,15); x.lineTo(pad+32,15); x.stroke();
+      x.fillStyle='#c2542b'; x.beginPath(); x.arc(pad+118,15,3.4,0,7); x.fill();
+      x.fillStyle=inkA; x.fillText('originale '+f+' Hz', pad+36, 19); x.fillText('campioni fs='+fs+' Hz', pad+126, 19);
+      if(!ok){ x.strokeStyle='#b42318'; x.setLineDash([6,4]); x.lineWidth=2; x.beginPath(); x.moveTo(pad+258,15); x.lineTo(pad+284,15); x.stroke(); x.setLineDash([]); x.fillStyle=inkA; x.fillText('alias '+fa.toFixed(1)+' Hz', pad+288, 19); }
+    }catch(e){}
     x.fillStyle='#1b2a30'; x.font='12px system-ui';
+    const inv = !ok && fall < 0 ? ' (con inversione di fase: la ricostruzione corretta è −sin(2π·'+fa.toFixed(1)+'·t), non +sin)' : '';
     $('aliasResult').innerHTML = ok
       ? `Condizione rispettata: f<sub>s</sub> = ${fs} Hz superiore a 2·${f} = ${2*f} Hz. Ricostruzione fedele.`
-      : `Aliasing: sarebbero necessari oltre ${2*f} Hz, contro i ${fs} Hz impostati. Frequenza apparente: circa <strong>${fa.toFixed(1)} Hz</strong> (frequenza di Nyquist: ${(fs/2).toFixed(1)} Hz).`;
+      : `Aliasing: sarebbero necessari oltre ${2*f} Hz, contro i ${fs} Hz impostati. Frequenza apparente: circa <strong>${fa.toFixed(1)} Hz</strong>${inv} (frequenza di Nyquist: ${(fs/2).toFixed(1)} Hz).`;
   }
   aF?.addEventListener('input',drawAlias); aFs?.addEventListener('input',drawAlias); drawAlias();
 
@@ -94,9 +109,15 @@
     }
     x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted'); x.font='11px system-ui';
     x.fillText('max '+max.toFixed(1), 4, 14);
-    bars(sig,'#94a3b8',0); bars(m1,'#0f6f6a',14); bars(m2,'#16794c',28);
-    x.fillStyle='#0f6f6a'; x.fillRect(8,h-14,10,10); x.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--ink');
-    x.fillText('grigio: originale; blu: media; verde: mediano', 24, h-5);
+    bars(sig,'#94a3b8',0); bars(m1,'#2563eb',14); bars(m2,'#16794c',28);
+    const ink = (getComputedStyle(document.documentElement).getPropertyValue('--ink') || '#1b2a30').trim() || '#1b2a30';
+    x.font='11px system-ui';
+    // legenda a tre campioni, con colori identici alle barre
+    x.fillStyle='#94a3b8'; x.fillRect(8,h-14,10,10);
+    x.fillStyle='#2563eb'; x.fillRect(96,h-14,10,10);
+    x.fillStyle='#16794c'; x.fillRect(172,h-14,10,10);
+    x.fillStyle=ink;
+    x.fillText('originale', 22, h-5); x.fillText('media', 110, h-5); x.fillText('mediano', 186, h-5);
     const spikeIdx=sig.indexOf(Math.max(...sig));
     $('filterResult').innerHTML=`W=${W}: in corrispondenza del valore anomalo (indice ${spikeIdx}, valore ${Math.max(...sig)}) la media restituisce <strong>${m1[spikeIdx].toFixed(2)}</strong> (errore distribuito ai campioni vicini), il mediano restituisce <strong>${m2[spikeIdx].toFixed(2)}</strong> (outlier escluso). Sequenza originale: [${sig.join(', ')}]`;
   }
@@ -115,7 +136,7 @@
     function curve(fn,color){ x.strokeStyle=color;x.lineWidth=2.4;x.beginPath(); for(let i=0;i<=100;i++){ const cx=1+i/100*9, v=fn(cx); const px=pad+i/100*W, py=(h-26)-(v/10)*H; i?x.lineTo(px,py):x.moveTo(px,py);} x.stroke(); }
     curve(cx=>9*Math.exp(-cx/2.2)+0.6,'#0f6f6a');      // bias
     curve(cx=>0.4+0.09*cx*cx,'#c2542b');               // variance
-    curve(cx=>9*Math.exp(-cx/2.2)+0.09*cx*cx+0.9,'#16794c'); // totale
+    curve(cx=>9*Math.exp(-cx/2.2)+0.09*cx*cx+1.0,'#16794c'); // totale = bias + varianza
     const inkCol = (getComputedStyle(document.documentElement).getPropertyValue('--ink') || '#1b2a30').trim() || '#1b2a30';
     const px=pad+(c-1)/9*W; x.strokeStyle=inkCol; x.setLineDash([4,4]); x.beginPath(); x.moveTo(px,8); x.lineTo(px,h-26); x.stroke(); x.setLineDash([]);
     x.font='11px system-ui'; x.fillStyle='#0f6f6a'; x.fillText('bias',pad+4,16); x.fillStyle='#c2542b'; x.fillText('varianza',w-90,16); x.fillStyle='#16794c'; x.fillText('errore totale',w-160,h-30);
