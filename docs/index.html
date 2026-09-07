@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMI Lab — Guida Interattiva a Interazione Uomo-Macchina</title>
+<meta name="description" content="Guida interattiva e moderna agli appunti di Interfacce Uomo-Macchina: segnali fisiologici, machine learning, affective computing, BCI, DEAP, laboratorio MATLAB ed eserciziario per l'esame.">
+<meta name="author" content="G.C. — Università degli Studi dell'Insubria">
+<meta property="og:title" content="HMI Lab — Guida Interattiva a Interazione Uomo-Macchina">
+<meta property="og:description" content="Segnali, ML, emozioni, BCI e DEAP: studia con laboratori interattivi, quiz e formulario.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#contenuto">Salta al contenuto</a>
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="HMI Lab home">
+      <span class="brand-mark" aria-hidden="true">◉</span>
+      <span class="brand-text"><strong>HMI Lab</strong><small>Interazione Uomo-Macchina</small></span>
+    </a>
+    <nav class="site-nav" aria-label="Navigazione principale">
+      <a href="#cap01">Guida</a>
+      <a href="#laboratori">Laboratori</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#formulario">Formulario</a>
+    </nav>
+    <div class="header-actions">
+      <label class="search-box">
+        <span class="visually-hidden">Cerca nella guida</span>
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" placeholder="Cerca: es. Nyquist, SVM, P300…" autocomplete="off">
+      </label>
+      <button id="themeToggle" class="btn btn-ghost" type="button" aria-label="Cambia tema chiaro o scuro">Tema</button>
+      <button id="menuToggle" class="btn btn-ghost only-mobile" type="button" aria-expanded="false" aria-controls="toc">☰ Indice</button>
+    </div>
+  </div>
+</header>
+
+<main id="contenuto">
+<!-- HERO -->
+<section class="hero wrap" aria-labelledby="heroTitle">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">Università degli Studi dell'Insubria · A.A. 2025–2026 · Appunti del corso</p>
+      <h1 id="heroTitle">Interazione Uomo-Macchina: <em>appunti interattivi</em></h1>
+      <p class="lead">Dagli appunti del corso: segnali fisiologici, machine learning, affective computing, BCI e dataset DEAP — con laboratori interattivi, esercizi svolti e formulario.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#cap01">Inizia dal Capitolo 1</a>
+        <a class="btn btn-secondary" href="#quiz">Quiz di verifica</a>
+        <a class="btn btn-ghost" href="https://github.com/GABRYCA/appunti-interazione-uomo-macchina/blob/master/main.pdf?raw=true" rel="noopener">PDF degli appunti</a>
+      </div>
+      <dl class="hero-stats" aria-label="Contenuti della guida">
+        <div><dt>Capitoli</dt><dd>8</dd></div>
+        <div><dt>Laboratori</dt><dd>7</dd></div>
+        <div><dt>Domande di verifica</dt><dd>12</dd></div>
+      </dl>
+      <p class="disclaimer">Nota metodologica: rielaborazione personale a scopo didattico. Per la preparazione si raccomanda l'integrazione con il materiale ufficiale del corso.</p>
+    </div>
+    <figure class="hero-figure" aria-labelledby="heroFigCap">
+      <svg viewBox="0 0 460 300" role="img" aria-label="Schema del ciclo di interazione uomo-macchina e dei quattro blocchi della guida">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <!-- ciclo -->
+        <g font-family="inherit" font-size="13">
+          <rect x="20" y="24" width="120" height="56" rx="10" class="hf-node"/>
+          <text x="80" y="48" text-anchor="middle" class="hf-text"><tspan font-weight="700">Utente</tspan></text>
+          <text x="80" y="65" text-anchor="middle" class="hf-sub">input · segnali</text>
+          <rect x="320" y="24" width="120" height="56" rx="10" class="hf-node"/>
+          <text x="380" y="48" text-anchor="middle" class="hf-text"><tspan font-weight="700">Macchina</tspan></text>
+          <text x="380" y="65" text-anchor="middle" class="hf-sub">output · feedback</text>
+          <line x1="140" y1="38" x2="312" y2="38" class="hf-edge" marker-end="url(#arr)"/>
+          <text x="226" y="30" text-anchor="middle" class="hf-label">Segnali</text>
+          <line x1="320" y1="66" x2="148" y2="66" class="hf-edge" marker-end="url(#arr)"/>
+          <text x="234" y="80" text-anchor="middle" class="hf-label">Feedback</text>
+        </g>
+        <!-- blocchi -->
+        <g font-family="inherit" font-size="12">
+          <a href="#cap02" class="hf-block"><rect x="20" y="120" width="200" height="72" rx="10"/><text x="32" y="146" font-weight="700">I · Segnali</text><text x="32" y="164" class="hf-sub">Nyquist · SNR · filtri</text></a>
+          <a href="#cap03" class="hf-block"><rect x="240" y="120" width="200" height="72" rx="10"/><text x="252" y="146" font-weight="700">II · Apprendimento</text><text x="252" y="164" class="hf-sub">validazione · metriche</text></a>
+          <a href="#cap04" class="hf-block"><rect x="20" y="204" width="200" height="72" rx="10"/><text x="32" y="230" font-weight="700">III · Emozioni e BCI</text><text x="32" y="248" class="hf-sub">Russell · DEAP · P300</text></a>
+          <a href="#quiz" class="hf-block"><rect x="240" y="204" width="200" height="72" rx="10"/><text x="252" y="230" font-weight="700">IV · Verifica</text><text x="252" y="248" class="hf-sub">esercizi · quiz · formule</text></a>
+        </g>
+      </svg>
+      <figcaption id="heroFigCap">Il ciclo di interazione e l'organizzazione della guida in quattro blocchi.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- PERCORSO -->
+<section class="wrap overview" aria-labelledby="ovTitle">
+  <h2 id="ovTitle">Organizzazione della guida</h2>
+  <ol class="overview-grid">
+    <li><a href="#cap01"><span class="ov-n">01–02</span><strong>Fondamenti e segnali</strong><span class="ov-d">Ciclo HMI, acquisizione, campionamento, qualità del segnale.</span></a></li>
+    <li><a href="#cap03"><span class="ov-n">03</span><strong>Apprendimento automatico</strong><span class="ov-d">Generalizzazione, validazione, valutazione, classificatori.</span></a></li>
+    <li><a href="#cap04"><span class="ov-n">04–05 · 08</span><strong>Emozioni, cervello, DEAP</strong><span class="ov-d">Modelli affettivi, EEG, paradigmi BCI, benchmark.</span></a></li>
+    <li><a href="#cap06"><span class="ov-n">06–07 · Quiz</span><strong>Pratica e verifica</strong><span class="ov-d">Pipeline MATLAB, esercizi svolti, quiz, formulario.</span></a></li>
+  </ol>
+</section>
+
+<div class="wrap layout">
+<!-- TOC -->
+<aside class="toc" id="toc" aria-label="Indice della guida">
+  <div class="toc-inner">
+    <p class="toc-title">Indice</p>
+    <nav aria-label="Capitoli">
+      <a href="#cap01" data-toc><span class="n">01</span> Introduzione HMI</a>
+      <a href="#cap02" data-toc><span class="n">02</span> Segnali, rumore, filtri</a>
+      <a href="#cap03" data-toc><span class="n">03</span> Machine Learning</a>
+      <a href="#cap04" data-toc><span class="n">04</span> Affective Computing</a>
+      <a href="#cap05" data-toc><span class="n">05</span> Brain-Computer Interfaces</a>
+      <a href="#cap06" data-toc><span class="n">06</span> Laboratorio MATLAB</a>
+      <a href="#cap07" data-toc><span class="n">07</span> Eserciziario svolto</a>
+      <a href="#cap08" data-toc><span class="n">08</span> Caso studio DEAP</a>
+      <a href="#quiz" data-toc><span class="n">09</span> Quiz di verifica</a>
+      <a href="#formulario" data-toc><span class="n">10</span> Formulario di sintesi</a>
+    </nav>
+    <div class="toc-foot">
+      <p><strong>Metodo di studio consigliato</strong><br>Leggere la sezione, utilizzare il laboratorio corrispondente, svolgere la verifica.</p>
+      <p id="searchCount" class="muted" role="status"></p>
+    </div>
+  </div>
+</aside>
+
+<div class="content">
+<p class="no-results" id="noResults" hidden>Nessun risultato per questa ricerca. Prova con: <button class="linklike" type="button" data-suggest="Nyquist">Nyquist</button>, <button class="linklike" type="button" data-suggest="SVM">SVM</button>, <button class="linklike" type="button" data-suggest="P300">P300</button>, <button class="linklike" type="button" data-suggest="Russell">Russell</button>.</p>
+
+<!-- CAP 01 -->
+<section class="chapter" id="cap01" data-searchable aria-labelledby="cap01t">
+  <p class="chap-kicker">Capitolo 01 · Concetti base</p>
+  <h2 id="cap01t">Introduzione: il ciclo Uomo ⇄ Macchina</h2>
+  <p>Ogni interfaccia è un <strong>dialogo a ciclo chiuso</strong>: l'utente invia <em>input/segnali</em> (voce, gesti, sguardo, biosegnali), la macchina risponde con <em>output/feedback</em> (grafica, audio, aptica). Se il feedback manca o è ambiguo, il cervello non può adattarsi: è in questi casi che si manifestano gli errori d'uso.</p>
+  <div class="diagram" role="img" aria-label="Schema: Utente invia input e segnali alla macchina, la macchina restituisce output e feedback all'utente">
+    <div class="loop">
+      <div class="loop-node user">Utente</div>
+      <div class="loop-arrows">
+        <div class="loop-arrow top"><span>Input / Segnali →</span></div>
+        <div class="loop-arrow bottom"><span>← Output / Feedback</span></div>
+      </div>
+      <div class="loop-node machine">Macchina</div>
+    </div>
+  </div>
+  <h3>Evoluzione in 5 fasi</h3>
+  <ol class="timeline">
+    <li><strong>Manuale (Batch)</strong> — schede perforate, interruttori. Interazione indiretta e lentissima.</li>
+    <li><strong>CLI</strong> — riga di comando: potente ma richiede sintassi e memoria.</li>
+    <li><strong>GUI (WIMP)</strong> — Window, Icon, Menu, Pointer: l'informatica diventa di massa.</li>
+    <li><strong>Web e Mobile</strong> — touch, ipertesti, sensori ovunque.</li>
+    <li><strong>Multimodale / Intelligente</strong> — voce + gesti + sguardo + fisiologia; il sistema si adatta all'utente (HCI moderna).</li>
+  </ol>
+  <div class="grid2">
+    <article class="card">
+      <h4>Multimodalità (input)</h4>
+      <p>Le modalità con cui l'utente fornisce informazioni alla macchina, anche in combinazione: voce, gesti e postura, tracciamento oculare, segnali fisiologici (HR, EDA, EEG).</p>
+    </article>
+    <article class="card">
+      <h4>Multimedialità (output)</h4>
+      <p>I media con cui il sistema comunica all'utente: testo, audio, video. Riguarda la presentazione dell'informazione, non l'interpretazione dell'intento.</p>
+    </article>
+  </div>
+  <details class="callout">
+    <summary>Ambiti applicativi</summary>
+    <ul>
+      <li><strong>VR/AR</strong> — es. torri di controllo aumentate per gestire flussi visivi densi.</li>
+      <li><strong>Social robot</strong> — compagni per anziani, supporto terapeutico con lettura delle emozioni.</li>
+      <li><strong>ADAS</strong> — auto che rileva stress/sonnolenza da biosegnali e sguardo per prevenire incidenti.</li>
+      <li><strong>Tecnologie assistive</strong> — esoscheletri e BCI per SLA e disabilità motorie gravi.</li>
+    </ul>
+  </details>
+  <p class="key"><strong>Punto chiave per l'esame:</strong> multimodale = più <em>input</em> sinergici; multimediale = più <em>media</em> in output. WIMP = Window, Icon, Menu, Pointer.</p>
+</section>
+
+<!-- CAP 02 -->
+<section class="chapter" id="cap02" data-searchable aria-labelledby="cap02t">
+  <p class="chap-kicker">Capitolo 02 · Il fondamento fisico</p>
+  <h2 id="cap02t">Segnali, rumore e filtraggio</h2>
+  <h3>Catena di acquisizione</h3>
+  <ol class="steps">
+    <li><strong>Sensore/elettrodi</strong> — ECG (cuore), EDA/GSR (sudorazione).</li>
+    <li><strong>Amplificatore + filtro analogico</strong> — il biosegnale è in mV/µV.</li>
+    <li><strong>ADC</strong> — campionamento + quantizzazione.</li>
+    <li><strong>Elaborazione</strong> — PC o microcontrollore: riduzione del rumore, estrazione delle feature, decisione.</li>
+  </ol>
+  <div class="grid2">
+    <article class="card"><h4>ECG</h4><p>Attività elettrica del cuore. Da qui <strong>HR</strong> e <strong>HRV</strong> (variabilità R–R): SDNN (lungo termine), RMSSD (parasimpatico, battito-battito). Il complesso <strong>QRS</strong> con picco <strong>R</strong> è il riferimento. Problema tipico: <em>baseline wander</em> (respiro/movimento) → <code>detrend</code>.</p></article>
+    <article class="card"><h4>EDA / GSR</h4><p>Conduttanza cutanea = sudorazione = <strong>arousal</strong>. Si separa in <strong>SCL</strong> tonica lenta (stato generale, taglio ~0,05 Hz) e <strong>SCR</strong> fasica veloce (picchi di paura/sorpresa, ~1–2 Hz).</p></article>
+  </div>
+
+  <h3 id="laboratori">Laboratorio 1 — Nyquist e aliasing</h3>
+  <p>Se la condizione <span class="formula">f<sub>s</sub> &gt; 2·f<sub>max</sub></span> non è soddisfatta, le componenti ad alta frequenza vengono ricostruite come frequenze inferiori (effetto di ripiegamento attorno a f<sub>s</sub>/2).</p>
+  <div class="lab" data-lab="alias">
+    <div class="lab-controls">
+      <label>Frequenza segnale f (Hz) <output id="aliasFOut">8</output><input id="aliasF" type="range" min="1" max="50" value="8" step="1"></label>
+      <label>Frequenza campionamento f<sub>s</sub> (Hz) <output id="aliasFsOut">10</output><input id="aliasFs" type="range" min="2" max="100" value="10" step="1"></label>
+    </div>
+    <canvas id="aliasCanvas" width="640" height="240" aria-label="Grafico aliasing"></canvas>
+    <p class="lab-result" id="aliasResult" role="status"></p>
+    <p class="muted">Esempio da esame: x(t)=sin(2π·100t), f<sub>s</sub>=150 Hz → f<sub>Nyq</sub>=200 Hz richiesta, alias = |150−100| = <strong>50 Hz</strong>.</p>
+  </div>
+
+  <h3>Laboratorio 2 — Quantizzazione, SQNR e bitrate</h3>
+  <p><span class="formula">L = 2<sup>b</sup></span> · <span class="formula">Δ = (x<sub>max</sub>−x<sub>min</sub>)/L</span> <span class="muted">(in pratica spesso /(L−1) per includere entrambi gli estremi)</span> · errore in <span class="formula">[−Δ/2, +Δ/2]</span> · <span class="formula">SQNR ≈ 6,02·b + 1,76 dB</span> · <span class="formula">R = b·f<sub>s</sub></span>. Il <strong>dithering</strong> aggiunge rumore bianco prima di quantizzare per decorrelare l'errore dal segnale.</p>
+  <div class="lab" data-lab="quant">
+    <div class="lab-controls">
+      <label>Bit b <output id="qBitsOut">3</output><input id="qBits" type="range" min="1" max="8" value="3" step="1"></label>
+      <label>f<sub>s</sub> (Hz) <output id="qFsOut">200</output><input id="qFs" type="range" min="50" max="1000" value="200" step="10"></label>
+      <label>V<sub>in</sub> (V, intervallo 0–5) <output id="qVinOut">2.15</output><input id="qVin" type="range" min="0" max="5" value="2.15" step="0.01"></label>
+    </div>
+    <canvas id="quantCanvas" width="640" height="220" aria-label="Grafico quantizzazione"></canvas>
+    <p class="lab-result" id="quantResult" role="status"></p>
+    <p class="muted">Relazione di riferimento: ogni bit aggiuntivo apporta circa 6 dB. Da 8 a 16 bit i livelli passano da 256 a 65536 (×256).</p>
+  </div>
+
+  <h3>Energia, potenza, SNR</h3>
+  <div class="table-wrap"><table>
+    <caption>Energia e potenza (continuo / discreto)</caption>
+    <tr><th>Misura</th><th>Continuo</th><th>Discreto</th></tr>
+    <tr><td>Energia</td><td>E = ∫|x(t)|² dt</td><td>E = Σ|x[n]|²</td></tr>
+    <tr><td>Potenza media</td><td>P = lim 1/2T ∫<sub>−T</sub><sup>T</sup>|x|²</td><td>P = lim 1/(2N+1) Σ|x|²</td></tr>
+    <tr><td>SNR</td><td colspan="2">SNR<sub>dB</sub> = 10·log₁₀(P<sub>seg</sub>/P<sub>rum</sub>)</td></tr>
+  </table></div>
+  <div class="lab" data-lab="energy">
+    <div class="lab-controls">
+      <label>Ampiezza A <output id="enAOut">10</output><input id="enA" type="range" min="1" max="20" value="10" step="0.5"></label>
+      <label>Frequenza f (Hz) <output id="enFOut">5</output><input id="enF" type="range" min="1" max="50" value="5" step="1"></label>
+    </div>
+    <p class="lab-result" id="energyResult" role="status"></p>
+  </div>
+  <p class="key">Sinusoide A·cos(2πft) su tempo infinito: <strong>E = ∞</strong>, <strong>P = A²/2</strong> (la frequenza e la fase non influiscono). Su un periodo T: E = (A²/2)·T.</p>
+
+  <h3>Laboratorio 3 — Filtri di media e mediano a confronto</h3>
+  <p>Media mobile (lineare): <span class="formula">y[n] = ⅟W Σ x[n−i]</span> — ottima sul rumore bianco, ma <em>spalma</em> gli spike e sfoca i bordi. Mediano (non lineare, rango): <span class="formula">y[n] = mediana(finestra)</span> — ignora gli outlier e preserva i gradini.</p>
+  <div class="lab" data-lab="filter">
+    <div class="lab-controls">
+      <label>Finestra W (dispari) <output id="filtWOut">3</output><input id="filtW" type="range" min="3" max="7" value="3" step="2"></label>
+      <button class="btn btn-secondary" id="filtSpike" type="button">Aggiungi spike casuale</button>
+      <button class="btn btn-ghost" id="filtReset" type="button">Ripristina [2,3,2,20,3,2,1]</button>
+    </div>
+    <canvas id="filterCanvas" width="640" height="240" aria-label="Confronto filtri"></canvas>
+    <p class="lab-result" id="filterResult" role="status"></p>
+  </div>
+  <div class="table-wrap"><table>
+    <caption>Criteri di scelta dei filtri per ECG ed EDA</caption>
+    <tr><th>Problema</th><th>Causa</th><th>Soluzione</th></tr>
+    <tr><td>Deriva baseline</td><td>Respiro, SCL, cavi</td><td><strong>Passa-alto</strong> ~0,5 Hz o <code>detrend</code></td></tr>
+    <tr><td>Ronzio di rete</td><td>Impianto elettrico</td><td><strong>Notch</strong> a 50 Hz (60 Hz USA)</td></tr>
+    <tr><td>Rumore muscolare EMG</td><td>Contrazioni</td><td><strong>Passa-basso</strong> 25–40 Hz</td></tr>
+    <tr><td>Spike improvvisi</td><td>Urto elettrodo</td><td><strong>Mediano</strong> (non spalmare!)</td></tr>
+    <tr><td>Ringing</td><td>Ordine Butterworth eccessivo</td><td>Abbassa l'ordine</td></tr>
+  </table></div>
+  <div class="warn"><strong>Nota d'esame:</strong> su EDA con spike, prima il <strong>mediano</strong> (rimuove l'outlier), poi la media/passa-basso per la SCL. Fare il contrario inquina tutto il trend.</div>
+</section>
+
+<!-- CAP 03 -->
+<section class="chapter" id="cap03" data-searchable aria-labelledby="cap03t">
+  <p class="chap-kicker">Capitolo 03 · Modelli e validazione</p>
+  <h2 id="cap03t">Machine Learning per l'HMI</h2>
+  <p>Nelle interfacce biometriche domina l'<strong>apprendimento supervisionato</strong> (X = segnale, Y = etichetta, es. "stress"). Il non supervisionato (es. K-Means) serve per cluster e anomalie senza label.</p>
+  <h3>Laboratorio 4 — Bias ⇄ Varianza (compromesso di generalizzazione)</h3>
+  <p><strong>Underfitting</strong> = bias alto (modello troppo semplice, sbaglia ovunque). <strong>Overfitting</strong> = varianza alta (impara a memoria il rumore: perfetto sul train, disastroso sul test). L'obiettivo è la <strong>generalizzazione</strong>.</p>
+  <div class="lab" data-lab="bias">
+    <div class="lab-controls">
+      <label>Complessità modello <output id="biasOut">5</output><input id="biasC" type="range" min="1" max="10" value="5" step="1"></label>
+    </div>
+    <canvas id="biasCanvas" width="640" height="220" aria-label="Curve bias varianza"></canvas>
+    <p class="lab-result" id="biasResult" role="status"></p>
+  </div>
+  <h3>Maledizione della dimensionalità (Hughes)</h3>
+  <p>Più feature ≠ più accuratezza: oltre un limite i dati diventano sparsi e le distanze euclidee (k-NN!) collassano. Rimedi: <strong>PCA</strong> (nuove variabili compatte) e <strong>feature selection</strong> (via correlazione di Pearson: scarta le quasi-duplicate vicine a ±1). Poi <strong>normalizza</strong>: Min-Max in [0,1] oppure Z-score <span class="formula">z = (x−μ)/σ</span>.</p>
+  <div class="danger"><strong>Non normalizzare prima dello split.</strong> Procedura corretta: ① split train/test → ② fit (media/min/max) <em>solo sul train</em> → ③ transform di entrambi con gli stessi parametri. Altrimenti è <strong>data leakage</strong>.</div>
+  <h3>Validazione: K-Fold e LOSO</h3>
+  <ul>
+    <li><strong>K-Fold:</strong> K rotazioni train/test, media stabile. Ideale per dataset piccoli.</li>
+    <li><strong>LOSO (Leave-One-Subject-Out):</strong> allena su N−1 soggetti, testa sul soggetto escluso. Misura se il sistema è <strong>subject-independent</strong> (funziona su un utente mai visto).</li>
+  </ul>
+  <p>Ulteriore causa di data leakage: finestre temporali con sovrapposizione, combinate con suddivisione casuale, collocano finestre quasi identiche sia in train che in test, con prestazioni apparentemente elevate ma non generalizzabili.</p>
+  <h3>Laboratorio 5 — Metriche dalla matrice di confusione</h3>
+  <p><span class="formula">Acc = (TP+TN)/tot</span> · <span class="formula">Prec = TP/(TP+FP)</span> · <span class="formula">Rec = TP/(TP+FN)</span> · <span class="formula">F1 = 2·P·R/(P+R)</span>. L'accuracy è poco informativa sui dataset sbilanciati: in tali casi si considerano F1 e Recall.</p>
+  <div class="lab" data-lab="metrics">
+    <div class="lab-controls lab-grid4">
+      <label>TP <input id="mTP" type="number" value="40" min="0"></label>
+      <label>TN <input id="mTN" type="number" value="950" min="0"></label>
+      <label>FP <input id="mFP" type="number" value="10" min="0"></label>
+      <label>FN <input id="mFN" type="number" value="5" min="0"></label>
+    </div>
+    <div class="confusion" aria-label="Matrice di confusione">
+      <div></div><div class="ch">Predetto +</div><div class="ch">Predetto −</div>
+      <div class="ch">Reale +</div><div class="cell tp">TP<br><strong id="cTP">40</strong></div><div class="cell fn">FN<br><strong id="cFN">5</strong></div>
+      <div class="ch">Reale −</div><div class="cell fp">FP<br><strong id="cFP">10</strong></div><div class="cell tn">TN<br><strong id="cTN">950</strong></div>
+    </div>
+    <p class="lab-result" id="metricsResult" role="status"></p>
+  </div>
+  <h3>Sintesi degli algoritmi di classificazione</h3>
+  <div class="cards">
+    <article class="card"><h4>k-NN</h4><p>Metodo lazy e non parametrico: assegna la classe maggioritaria tra i K vicini. K = 1 favorisce overfitting; valori elevati favoriscono underfitting. Sensibile alla dimensionalità e alla scala: richiede standardizzazione.</p></article>
+    <article class="card"><h4>Alberi di decisione e Random Forest</h4><p>L'albero seleziona suddivisioni che minimizzano l'impurità <span class="formula">Gini = 1−Σ p<sub>i</sub>²</span>, con tendenza all'overfitting. La foresta (bagging e voto di maggioranza su campioni e feature) riduce la varianza.</p></article>
+    <article class="card"><h4>SVM</h4><p>Ricerca l'iperpiano <span class="formula">w·x+b = 0</span> a margine massimo <span class="formula">2/‖w‖</span>. Il parametro <strong>C</strong> regola la tolleranza agli errori. Il <strong>kernel trick</strong> (RBF, polinomiale) tratta i casi non linearmente separabili.</p></article>
+    <article class="card"><h4>Regressione logistica</h4><p>Trasforma il predittore lineare tramite la sigmoide <span class="formula">σ(z)=1/(1+e<sup>−z</sup>)</span> in probabilità. Funzione di costo log-loss convessa: la discesa del gradiente converge al minimo globale.</p></article>
+  </div>
+</section>
+
+<!-- CAP 04 -->
+<section class="chapter" id="cap04" data-searchable aria-labelledby="cap04t">
+  <p class="chap-kicker">Capitolo 04 · Modelli delle emozioni</p>
+  <h2 id="cap04t">Affective Computing</h2>
+  <p>Settore dedicato al riconoscimento, all'interpretazione e alla simulazione delle emozioni. Ai modelli categoriali si affianca la rappresentazione continua nello spazio affettivo.</p>
+  <div class="grid2">
+    <article class="card"><h4>Modello di Ekman (6 emozioni)</h4><p>Gioia, tristezza, rabbia, paura, disgusto, sorpresa: categorie di base, considerate universali e osservabili nelle micro-espressioni facciali.</p></article>
+    <article class="card"><h4>Ruota di Plutchik (8 emozioni)</h4><p>Quattro coppie di opposti (gioia/tristezza, fiducia/disgusto, paura/rabbia, sorpresa/anticipazione). Le emozioni complesse derivano dalla combinazione delle primarie.</p></article>
+  </div>
+  <h3>Laboratorio 6 — Circumplex di Russell (1980): esplorazione dei quadranti</h3>
+  <p>Asse X = <strong>Valenza</strong> (spiacevole → piacevole), asse Y = <strong>Arousal</strong> (calmo → frenetico).</p>
+  <div class="lab" data-lab="russell">
+    <svg id="russellSvg" viewBox="0 0 400 400" role="img" aria-label="Modello circonflesso di Russell interattivo">
+      <circle cx="200" cy="200" r="150" fill="none" stroke="currentColor" stroke-dasharray="6 6" opacity="0.4"/>
+      <line x1="20" y1="200" x2="380" y2="200" stroke="currentColor" stroke-width="2"/><line x1="200" y1="20" x2="200" y2="380" stroke="currentColor" stroke-width="2"/>
+      <text x="372" y="195" font-size="12">Valenza +</text><text x="8" y="195" font-size="12">−</text>
+      <text x="206" y="30" font-size="12">Arousal +</text><text x="206" y="392" font-size="12">−</text>
+      <g id="russellQuads" font-size="13" text-anchor="middle" font-weight="700">
+        <rect x="200" y="50" width="150" height="150" fill="#22c55e" opacity="0.18" data-q="HA-HV" tabindex="0" role="button" aria-label="Alto arousal alta valenza: eccitato felice"/>
+        <rect x="50" y="50" width="150" height="150" fill="#ef4444" opacity="0.18" data-q="HA-LV" tabindex="0" role="button" aria-label="Alto arousal bassa valenza: arrabbiato ansioso"/>
+        <rect x="50" y="200" width="150" height="150" fill="#a855f7" opacity="0.18" data-q="LA-LV" tabindex="0" role="button" aria-label="Basso arousal bassa valenza: triste depresso"/>
+        <rect x="200" y="200" width="150" height="150" fill="#3b82f6" opacity="0.18" data-q="LA-HV" tabindex="0" role="button" aria-label="Basso arousal alta valenza: rilassato calmo"/>
+      </g>
+      <g font-size="12" text-anchor="middle" pointer-events="none">
+        <text x="275" y="120">Eccitato / Felice</text><text x="125" y="120">Arrabbiato / Ansioso</text>
+        <text x="125" y="280">Triste / Depresso</text><text x="275" y="280">Rilassato / Calmo</text>
+      </g>
+    </svg>
+    <p class="lab-result" id="russellResult" role="status">Selezionare un quadrante per visualizzare emozione associata e correlati fisiologici.</p>
+  </div>
+  <div class="warn"><strong>Osservazione metodologica:</strong> i segnali fisiologici sono difficili da simulare volontariamente (principio del lie-detector) e offrono quindi misure veritiere in tempo reale. Il limite principale è la variabilità inter-soggetto, che richiede una <strong>calibrazione in-situ</strong> e limita la generalizzazione dei modelli.</div>
+</section>
+
+<!-- CAP 05 -->
+<section class="chapter" id="cap05" data-searchable aria-labelledby="cap05t">
+  <p class="chap-kicker">Capitolo 05 · Interfacce cervello-computer</p>
+  <h2 id="cap05t">Brain-Computer Interfaces (BCI)</h2>
+  <div class="grid2">
+    <article class="card"><h4>Invasive</h4><p>Elettrodi impiantati: elevato SNR, ma rischi chirurgici e progressivo degrado del segnale dovuto alla risposta tissutale.</p></article>
+    <article class="card"><h4>Non invasive (EEG)</h4><p>Elettrodi sullo scalpo: sicure e oggetto del corso, ma con risoluzione spaziale inferiore e maggiore sensibilità agli artefatti muscolari e oculari.</p></article>
+  </div>
+  <h3>Pipeline ad anello chiuso</h3>
+  <ol class="steps">
+    <li><strong>Acquisizione</strong> (cuffia EEG).</li>
+    <li><strong>Pre-processing ed estrazione delle feature</strong> (filtro notch a 50 Hz, ICA per artefatti oculari e muscolari).</li>
+    <li><strong>Classificazione</strong> (SVM, reti neurali).</li>
+    <li><strong>Dispositivo e feedback</strong> (cursore, braccio robotico, speller): il feedback consente al cervello di adattare il segnale.</li>
+  </ol>
+  <h3>Laboratorio 7 — Bande EEG: selezionare una riga della tabella</h3>
+  <div class="table-wrap"><table id="eegTable">
+    <caption>Bande di frequenza e stati mentali associati</caption>
+    <tr><th>Banda</th><th>Freq.</th><th>Stato</th></tr>
+    <tr data-band="Delta: sonno profondo, patologie in veglia." tabindex="0"><td><strong>δ Delta</strong></td><td>&lt; 4 Hz</td><td>Sonno profondo</td></tr>
+    <tr data-band="Theta: sonnolenza, meditazione profonda." tabindex="0"><td><strong>θ Theta</strong></td><td>4–7 Hz</td><td>Sonnolenza / meditazione</td></tr>
+    <tr data-band="Alpha: veglia rilassata a occhi chiusi, lobi occipitali." tabindex="0"><td><strong>α Alpha</strong></td><td>8–12 Hz</td><td>Veglia rilassata</td></tr>
+    <tr data-band="Mu: come alpha ma motorio; si desincronizza col movimento immaginato (ERD)." tabindex="0"><td><strong>μ Mu</strong></td><td>8–12 Hz</td><td>Corteccia motoria</td></tr>
+    <tr data-band="Beta: veglia attiva, concentrazione, calcolo." tabindex="0"><td><strong>β Beta</strong></td><td>12–30 Hz</td><td>Concentrazione</td></tr>
+    <tr data-band="Gamma: integrazione multisensoriale; spesso sporcata da EMG." tabindex="0"><td><strong>γ Gamma</strong></td><td>30–80 Hz</td><td>Elaborazione complessa</td></tr>
+  </table></div>
+  <p class="lab-result" id="eegResult" role="status">Seleziona una banda per i dettagli.</p>
+  <h3>Sistema 10-20</h3>
+  <p>Posizionamento elettrodi in % (10/20) da Nasion–Inion. Lettere = lobo (F, C, T, P, O). Numeri: <strong>dispari = sinistra, pari = destra, Z = midline</strong> (es. Fz, Cz, Pz).</p>
+  <h3>Paradigmi: P300 e Motor Imagery</h3>
+  <ul>
+    <li><strong>P300 Speller:</strong> matrice 6×6 che lampeggia; lo stimolo raro atteso genera un ERP positivo ~<strong>300 ms</strong> (oddball). Incrocio riga/colonna = lettera. Il P300 è di pochi µV → serve <strong>averaging</strong> su N trial (SNR ∝ √N). <em>Overt attention</em> (fissare) ≫ <em>covert</em> (attenzione mentale).</li>
+    <li><strong>Motor Imagery:</strong> per Locked-In Syndrome: immaginare di muovere mano/piedi desincronizza il ritmo <strong>μ</strong> controlaterale (ERD). Stesse mappe dell'esecuzione reale.</li>
+  </ul>
+  <div class="lab" data-lab="p300">
+    <div class="lab-controls">
+      <label>Numero di trial mediati (N) <output id="p300Out">1</output><input id="p300N" type="range" min="1" max="64" value="1" step="1"></label>
+    </div>
+    <canvas id="p300Canvas" width="640" height="200" aria-label="Effetto averaging sul P300"></canvas>
+    <p class="lab-result" id="p300Result" role="status"></p>
+  </div>
+  <p class="muted">Software del corso: <strong>EEGLAB</strong> (MATLAB, offline, ICA per rimuovere blink) e <strong>OpenViBE</strong> (real-time / neurofeedback).</p>
+</section>
+
+<!-- CAP 06 -->
+<section class="chapter" id="cap06" data-searchable aria-labelledby="cap06t">
+  <p class="chap-kicker">Capitolo 06 · Attività di laboratorio</p>
+  <h2 id="cap06t">Laboratorio MATLAB (frammenti essenziali)</h2>
+  <p>Ogni blocco può essere copiato. Si noti l'uso di <code>filtfilt</code> (filtraggio a fase zero) e della standardizzazione (<code>Standardize</code>).</p>
+  <div class="code-block">
+    <div class="code-head"><span>ECG — detrend, passa-banda, picchi R, HR</span><button class="btn btn-ghost btn-copy" type="button" data-copy="codeEcg">Copia</button></div>
+<pre id="codeEcg"><code>% 1. Rimuove deriva baseline (respiro/movimento)
+ecg_detrend = detrend(ecg_raw, 'linear');
+% 2. Passa-banda Butterworth 0.5–25 Hz, zero-fase
+[b, a] = butter(2, [0.5 25]/(fs/2), 'bandpass');
+ecg_filt = filtfilt(b, a, ecg_detrend);
+% 3. Picchi R (ignora onde P/T con MinProminence)
+[isPeak, locs] = islocalmax(ecg_filt, 'MinProminence', 0.5);
+% 4. Intervalli R-R e HR
+rr_sec = diff(locs) / fs;
+hr_bpm = 60 ./ rr_sec;</code></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-head"><span>EDA — componente tonica (SCL) e fasica (SCR)</span><button class="btn btn-ghost btn-copy" type="button" data-copy="codeEda">Copia</button></div>
+<pre id="codeEda"><code>% Tonica SCL: passa-basso ~0.05 Hz (stato generale)
+[bT, aT] = butter(2, 0.05/(fs/2), 'low');
+GSR_tonica = filtfilt(bT, aT, gsr_raw);
+% Fasica SCR: sottrazione (reazioni rapide)
+GSR_fasica = gsr_raw - GSR_tonica;
+% Picchi emotivi ~ arousal
+[isEv, locEv] = islocalmax(GSR_fasica, 'MinProminence', 0.01);
+num_eventi = sum(isEv);</code></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-head"><span>ML — SVM, k-NN, validazione K-Fold e matrice di confusione</span><button class="btn btn-ghost btn-copy" type="button" data-copy="codeMl">Copia</button></div>
+<pre id="codeMl"><code>svm = fitcsvm(X, Y, 'KernelFunction', 'linear', 'Standardize', true);
+knn = fitcknn(X, Y, 'NumNeighbors', 5, 'Standardize', true);
+cv  = crossval(svm, 'KFold', 5);
+fprintf('Acc K-Fold: %.2f%%\n', (1-kfoldLoss(cv))*100);
+confusionchart(Y, kfoldPredict(cv));</code></pre>
+  </div>
+  <details class="callout"><summary>Progetto collegato: rilevamento dello stress con Empatica E4 (PPG e EDA)</summary>
+  <p>Il progetto utilizza il dataset Mendeley <em>EmpaticaE4Stress</em> (29 soggetti), il paper Data in Brief 2024 e il metodo MDPI di supporto, con i toolbox Signal Processing, Statistics and Machine Learning, Wavelet e Optimization. Script: <code>rilevamento_stress_paper_baseline*.m</code>. Si veda la cartella <code>Progetto/</code> nel repository.</p></details>
+</section>
+
+<!-- CAP 07 -->
+<section class="chapter" id="cap07" data-searchable aria-labelledby="cap07t">
+  <p class="chap-kicker">Capitolo 07 · Preparazione alla prova scritta</p>
+  <h2 id="cap07t">Eserciziario svolto</h2>
+  <div class="cards">
+    <article class="card"><h4>1 · Aliasing</h4><p>x=sin(2π·100t), f<sub>s</sub>=150 → Nyq=200, alias=|150−100|= <strong>50 Hz</strong>.</p></article>
+    <article class="card"><h4>2 · Quantizzazione</h4><p>0–5 V, 8 bit: L=256, Δ=5/255≈<strong>19,6 mV</strong>, SQNR≈<strong>49,9 dB</strong>, R=8·200=<strong>1600 bps</strong> (16 bit → 98 dB, 3200 bps).</p></article>
+    <article class="card"><h4>3 · Filtri su array</h4><p>[2,3,2,<strong>20</strong>,3,2,1], W=3: il mediano restituisce 3 (outlier eliminato), la media circa 8,33 (errore distribuito sui campioni vicini).</p></article>
+    <article class="card"><h4>4 · Metriche</h4><p>TP40 TN950 FP10 FN5: Acc <strong>98,5%</strong> (valore fuorviante su classi sbilanciate), Prec 80%, Rec 88,9%, F1 circa 0,84.</p></article>
+    <article class="card"><h4>5 · Energia/Potenza</h4><p>10·cos: su T, E=<strong>50T</strong>; P=<strong>A²/2</strong>, invariante con f.</p></article>
+    <article class="card"><h4>6 · EDA con spike</h4><p>Strategia: <strong>prima mediano, poi media</strong> per la SCL.</p></article>
+    <article class="card"><h4>7 · Teoria dei modelli</h4><p>La foresta supera il singolo albero (il voto riduce la varianza). Distribuzione a cerchio e anello: kernel <strong>RBF</strong>. Overfitting: <strong>bias basso e varianza elevata</strong>.</p></article>
+    <article class="card"><h4>8 · Quesiti a risposta multipla</h4><p>Due bit aggiuntivi: circa +12 dB. Errore massimo: ±Δ/2. Da 8 a 16 bit: livelli ×256. Dither: decorrela errore e segnale. Segnale a 15 kHz campionato a 20 kHz: <strong>aliasing</strong> (occorrerebbero oltre 30 kHz).</p></article>
+  </div>
+  <div class="danger"><strong>Livello ADC con fondoscala arbitrario:</strong> Livello = round((V<sub>in</sub>−V<sub>min</sub>)/Δ). Con −5…+5 V e ingresso 2,15 V: round(7,15/0,0392) = <strong>182</strong> (il calcolo semplificato restituirebbe erroneamente 55).</div>
+</section>
+
+<!-- CAP 08 -->
+<section class="chapter" id="cap08" data-searchable aria-labelledby="cap08t">
+  <p class="chap-kicker">Capitolo 08 · Analisi di un benchmark di riferimento</p>
+  <h2 id="cap08t">Caso studio: dataset DEAP</h2>
+  <ul class="fact-grid">
+    <li><strong>32</strong> partecipanti × <strong>40</strong> video musicali da 1 min (scelti dai tag Last.fm per coprire Russell)</li>
+    <li><strong>EEG 32 canali</strong> + periferici (GSR, ECG, respiro, temperatura, PPG, EOG/EMG) + face video (22 sogg.)</li>
+    <li><strong>SAM 1–9:</strong> Arousal, Valence, Dominance, Liking. Distinzione tra emozioni <em>felt</em> (provate) ed <em>espresse</em> (mostrate).</li>
+    <li><strong>Modality fusion:</strong> EEG + periferici + <strong>MCA</strong> (feature dei video-stimolo) ≫ singolo segnale. Il face video fu registrato ma <em>non</em> usato nei task del paper.</li>
+  </ul>
+  <p class="muted">Ricadute: salute mentale pre-clinica (ansia), UX, gaming adattivo.</p>
+</section>
+
+<!-- QUIZ -->
+<section class="chapter quiz" id="quiz" data-searchable aria-labelledby="quizt">
+  <p class="chap-kicker">Verifica finale · Esercitazione in stile esame</p>
+  <h2 id="quizt">Quiz di verifica</h2>
+  <p>12 domande sui tipi più frequenti, con feedback immediato e spiegazione. Il punteggio è conservato esclusivamente nel browser. <span class="muted">Nessun dato viene trasmesso all'esterno.</span></p>
+  <div class="quiz-bar">
+    <div class="quiz-progress"><div id="quizProg"></div></div>
+    <p><strong id="quizScore">Punteggio: 0 / 12</strong> · <span id="quizBest">miglior punteggio: —</span></p>
+    <button class="btn btn-ghost" id="quizReset" type="button">Ricomincia</button>
+  </div>
+  <div id="quizBox"></div>
+</section>
+
+<!-- FORMULARIO -->
+<section class="chapter" id="formulario" data-searchable aria-labelledby="formt">
+  <p class="chap-kicker">Sintesi conclusiva</p>
+  <h2 id="formt">Formulario di sintesi</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Tema</th><th>Formula / regola</th></tr>
+    <tr><td>Nyquist</td><td>f<sub>s</sub> &gt; 2·f<sub>max</sub> · alias = |f − k·f<sub>s</sub>| più vicino</td></tr>
+    <tr><td>Quantizzazione</td><td>L=2<sup>b</sup> · Δ=(max−min)/L · err ∈ [−Δ/2, Δ/2] · SQNR≈6,02b+1,76 · R=b·f<sub>s</sub></td></tr>
+    <tr><td>SNR</td><td>SNR<sub>dB</sub>=10·log₁₀(P<sub>seg</sub>/P<sub>rum</sub>) · P<sub>sin</sub>=A²/2 · E<sub>T</sub>=(A²/2)·T</td></tr>
+    <tr><td>Filtri</td><td>Media: y=mean(finestra) · Mediano: y=mediana · notch 50 Hz · ECG BP 0,5–25 Hz · SCL LP 0,05 Hz</td></tr>
+    <tr><td>ML data</td><td>z=(x−μ)/σ · split→fit(solo train)→transform · K-Fold · LOSO = subject-independent</td></tr>
+    <tr><td>Metriche</td><td>Acc=(TP+TN)/tot · P=TP/(TP+FP) · R=TP/(TP+FN) · F1=2PR/(P+R)</td></tr>
+    <tr><td>Modelli</td><td>Gini=1−Σp² · SVM: w·x+b=0, margine 2/‖w‖, C, RBF · σ(z)=1/(1+e<sup>−z</sup>)</td></tr>
+    <tr><td>Emozioni/BCI</td><td>Ekman 6 · Plutchik 8 · Russell V×A · SAM 1–9 · P300 ~300 ms, SNR∝√N · Mu ERD · 10-20: dispari=SX</td></tr>
+  </table></div>
+  <div class="hero-cta">
+    <button class="btn btn-primary" id="printBtn" type="button">Stampa o salva il formulario in PDF</button>
+    <a class="btn btn-secondary" href="#top">Torna all'inizio</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <p><strong>HMI Lab</strong> — guida didattica open agli <em>Appunti di Interazione Uomo-Macchina</em> (G.C., Insubria 2025–26). Licenza contenuti: <strong>CC BY-NC-SA 4.0</strong>.</p>
+  <p class="muted">Fonti: materiale ufficiale del corso · paper DEAP · dataset Empatica E4 (CC BY 4.0). Sito statico senza tracciamento: nessun cookie; il quiz utilizza esclusivamente lo storage locale del browser.</p>
+  <p><a href="https://github.com/GABRYCA/appunti-interazione-uomo-macchina" rel="noopener">Repository GitHub</a> · <a href="https://github.com/GABRYCA/appunti-interazione-uomo-macchina/blob/master/main.pdf?raw=true" rel="noopener">PDF degli appunti</a> · <a href="https://github.com/GABRYCA/ML-Stress-Rest" rel="noopener">Progetto ML-Stress-Rest</a></p>
+</footer>
+</div>
+</div>
+</main>
+<script src="./js/main.js" defer></script>
+<script src="./js/labs.js" defer></script>
+<script src="./js/quiz.js" defer></script>
+</body>
+</html>

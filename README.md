@@ -9,6 +9,12 @@ Mancano alcuni elementi teorici che mi sono costati dei punti all'esame.
 ## Progetto di laboratorio
 Guarda Repository: [ML-Stress-Rest](https://github.com/GABRYCA/ML-Stress-Rest)
 
+## Guida web interattiva (GitHub Pages)
+È disponibile una guida web basata sugli appunti, con laboratori interattivi (Nyquist, quantizzazione, filtri, metriche, Russell, P300), quiz d'esame e formulario.
+
+- Cartella sito: [`docs/`](docs/)
+- Anteprima locale: `python -m http.server -d docs 8000` poi apri `http://localhost:8000/`
+
 ### Download PDF compilato
 Cercate tra i files il file main.pdf oppure scaricate direttamente: [main.pdf](https://github.com/GABRYCA/appunti-interazione-uomo-macchina/blob/master/main.pdf?raw=true)
 
