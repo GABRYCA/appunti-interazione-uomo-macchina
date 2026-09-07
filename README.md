@@ -13,6 +13,7 @@ Guarda Repository: [ML-Stress-Rest](https://github.com/GABRYCA/ML-Stress-Rest)
 È disponibile una guida web basata sugli appunti, con laboratori interattivi (Nyquist, quantizzazione, filtri, metriche, Russell, P300), quiz d'esame e formulario.
 
 - Cartella sito: [`docs/`](docs/)
+- [DEMO](https://gabryca.github.io/appunti-interazione-uomo-macchina/)
 - Anteprima locale: `python -m http.server -d docs 8000` poi apri `http://localhost:8000/`
 
 ### Download PDF compilato

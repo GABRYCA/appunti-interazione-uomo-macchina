@@ -22,7 +22,7 @@
 <header class="site-header" id="top">
   <div class="wrap header-inner">
     <a class="brand" href="#top" aria-label="HMI Lab home">
-      <span class="brand-mark" aria-hidden="true">◉</span>
+      <img class="brand-mark" src="./assets/favicon.svg" alt="" aria-hidden="true" width="40" height="40">
       <span class="brand-text"><strong>HMI Lab</strong><small>Interazione Uomo-Macchina</small></span>
     </a>
     <nav class="site-nav" aria-label="Navigazione principale">
@@ -37,7 +37,11 @@
         <span aria-hidden="true">⌕</span>
         <input id="searchInput" type="search" placeholder="Cerca: es. Nyquist, SVM, P300…" autocomplete="off">
       </label>
-      <button id="themeToggle" class="btn btn-ghost" type="button" aria-label="Cambia tema chiaro o scuro">Tema</button>
+      <div class="theme-seg" role="group" aria-label="Tema di visualizzazione">
+        <button type="button" data-theme-value="auto" aria-pressed="true" title="Automatico (segue il sistema)" aria-label="Tema automatico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg></button>
+        <button type="button" data-theme-value="light" aria-pressed="false" title="Tema chiaro" aria-label="Tema chiaro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+        <button type="button" data-theme-value="dark" aria-pressed="false" title="Tema scuro" aria-label="Tema scuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+      </div>
       <button id="menuToggle" class="btn btn-ghost only-mobile" type="button" aria-expanded="false" aria-controls="toc">☰ Indice</button>
     </div>
   </div>
@@ -58,8 +62,8 @@
       </div>
       <dl class="hero-stats" aria-label="Contenuti della guida">
         <div><dt>Capitoli</dt><dd>8</dd></div>
-        <div><dt>Laboratori</dt><dd>7</dd></div>
-        <div><dt>Domande di verifica</dt><dd>12</dd></div>
+        <div><dt>Laboratori</dt><dd>9</dd></div>
+        <div><dt>Domande di verifica</dt><dd>16</dd></div>
       </dl>
       <p class="disclaimer">Nota metodologica: rielaborazione personale a scopo didattico. Per la preparazione si raccomanda l'integrazione con il materiale ufficiale del corso.</p>
     </div>
@@ -124,10 +128,6 @@
       <a href="#quiz" data-toc><span class="n">09</span> Quiz di verifica</a>
       <a href="#formulario" data-toc><span class="n">10</span> Formulario di sintesi</a>
     </nav>
-    <div class="toc-foot">
-      <p><strong>Metodo di studio consigliato</strong><br>Leggere la sezione, utilizzare il laboratorio corrispondente, svolgere la verifica.</p>
-      <p id="searchCount" class="muted" role="status"></p>
-    </div>
   </div>
 </aside>
 
@@ -183,6 +183,7 @@
 <section class="chapter" id="cap02" data-searchable aria-labelledby="cap02t">
   <p class="chap-kicker">Capitolo 02 · Il fondamento fisico</p>
   <h2 id="cap02t">Segnali, rumore e filtraggio</h2>
+  <p class="tldr"><strong>In breve:</strong> il corpo è analogico, il computer è digitale. Campiona oltre il doppio della frequenza massima (Nyquist), quantizza con bit sufficienti e togli ogni rumore con il filtro giusto: è tutto il capitolo.</p>
   <h3>Catena di acquisizione</h3>
   <ol class="steps">
     <li><strong>Sensore/elettrodi</strong> — ECG (cuore), EDA/GSR (sudorazione).</li>
@@ -221,6 +222,11 @@
   </div>
 
   <h3>Energia, potenza, SNR</h3>
+  <div class="grid2">
+    <article class="card"><h4>Rumore termico (bianco)</h4><p>Dai componenti elettronici, su tutto lo spettro a potenza quasi costante (es. gaussiano). Lo attenua bene la <strong>media mobile</strong>.</p></article>
+    <article class="card"><h4>Artefatti da movimento</h4><p>Micro-scivolamenti dell'elettrodo o muscoli: derive lente della baseline o <strong>spike impulsivi</strong> — questi ultimi vuole il <strong>mediano</strong>.</p></article>
+  </div>
+  <p class="muted">Terzo disturbo tipico: <strong>ronzio di rete</strong> a 50 Hz in Europa (60 Hz in USA) → <strong>filtro notch</strong>. Il filtro Butterworth è <strong>massimamente piatto</strong> in banda passante; ordini troppo alti causano <em>ringing</em>.</p>
   <div class="table-wrap"><table>
     <caption>Energia e potenza (continuo / discreto)</caption>
     <tr><th>Misura</th><th>Continuo</th><th>Discreto</th></tr>
@@ -249,6 +255,13 @@
     <p class="lab-result" id="filterResult" role="status"></p>
   </div>
   <div class="table-wrap"><table>
+    <caption>Media contro mediano: quando usare quale</caption>
+    <tr><th>Caratteristica</th><th>Media mobile (lineare)</th><th>Mediano (non lineare)</th></tr>
+    <tr><td>Rumore gaussiano</td><td>Attenua bene</td><td>Distorce leggermente</td></tr>
+    <tr><td>Spike impulsivi</td><td>Spalma l'errore (inefficace)</td><td>Elimina lo spike (ottimo)</td></tr>
+    <tr><td>Bordi netti / gradini</td><td>Addolcisce (sfoca)</td><td>Preserva intatti</td></tr>
+  </table></div>
+  <div class="table-wrap"><table>
     <caption>Criteri di scelta dei filtri per ECG ed EDA</caption>
     <tr><th>Problema</th><th>Causa</th><th>Soluzione</th></tr>
     <tr><td>Deriva baseline</td><td>Respiro, SCL, cavi</td><td><strong>Passa-alto</strong> ~0,5 Hz o <code>detrend</code></td></tr>
@@ -264,6 +277,7 @@
 <section class="chapter" id="cap03" data-searchable aria-labelledby="cap03t">
   <p class="chap-kicker">Capitolo 03 · Modelli e validazione</p>
   <h2 id="cap03t">Machine Learning per l'HMI</h2>
+  <p class="tldr"><strong>In breve:</strong> impara dal passato (train) per indovinare il futuro (test) senza barare: normalizza solo sul train, valida con K-Fold o su un soggetto mai visto (LOSO) e giudica con F1/Recall quando le classi sono sbilanciate.</p>
   <p>Nelle interfacce biometriche domina l'<strong>apprendimento supervisionato</strong> (X = segnale, Y = etichetta, es. "stress"). Il non supervisionato (es. K-Means) serve per cluster e anomalie senza label.</p>
   <h3>Laboratorio 4 — Bias ⇄ Varianza (compromesso di generalizzazione)</h3>
   <p><strong>Underfitting</strong> = bias alto (modello troppo semplice, sbaglia ovunque). <strong>Overfitting</strong> = varianza alta (impara a memoria il rumore: perfetto sul train, disastroso sul test). L'obiettivo è la <strong>generalizzazione</strong>.</p>
@@ -284,7 +298,7 @@
   </ul>
   <p>Ulteriore causa di data leakage: finestre temporali con sovrapposizione, combinate con suddivisione casuale, collocano finestre quasi identiche sia in train che in test, con prestazioni apparentemente elevate ma non generalizzabili.</p>
   <h3>Laboratorio 5 — Metriche dalla matrice di confusione</h3>
-  <p><span class="formula">Acc = (TP+TN)/tot</span> · <span class="formula">Prec = TP/(TP+FP)</span> · <span class="formula">Rec = TP/(TP+FN)</span> · <span class="formula">F1 = 2·P·R/(P+R)</span>. L'accuracy è poco informativa sui dataset sbilanciati: in tali casi si considerano F1 e Recall.</p>
+  <p><span class="formula">Acc = (TP+TN)/tot</span> · <span class="formula">Prec = TP/(TP+FP)</span> · <span class="formula">Rec = TP/(TP+FN)</span> · <span class="formula">F1 = 2·P·R/(P+R)</span>. L'accuracy è poco informativa sui dataset sbilanciati: in tali casi si considerano F1 e Recall. La Recall minimizza i falsi negativi ed è fondamentale in ambito medico.</p>
   <div class="lab" data-lab="metrics">
     <div class="lab-controls lab-grid4">
       <label>TP <input id="mTP" type="number" value="40" min="0"></label>
@@ -338,7 +352,8 @@
     </svg>
     <p class="lab-result" id="russellResult" role="status">Selezionare un quadrante per visualizzare emozione associata e correlati fisiologici.</p>
   </div>
-  <div class="warn"><strong>Osservazione metodologica:</strong> i segnali fisiologici sono difficili da simulare volontariamente (principio del lie-detector) e offrono quindi misure veritiere in tempo reale. Il limite principale è la variabilità inter-soggetto, che richiede una <strong>calibrazione in-situ</strong> e limita la generalizzazione dei modelli.</div>
+  <div class="warn"><strong>Osservazione metodologica:</strong> i segnali fisiologici sono difficili da simulare volontariamente (principio del lie-detector) e offrono quindi misure veritiere in tempo reale. Il limite principale è la variabilità <strong>inter-soggetto</strong> (tra persone diverse) e <strong>intra-soggetto</strong> (stessa persona nel tempo), che richiede una <strong>calibrazione in-situ</strong> e limita la generalizzazione dei modelli.</div>
+  <p class="muted">Il benchmark di riferimento — 32 soggetti, 40 video, autovalutazione SAM 1–9 — è descritto nel <a href="#cap08">caso studio DEAP</a>.</p>
 </section>
 
 <!-- CAP 05 -->
@@ -361,18 +376,18 @@
     <caption>Bande di frequenza e stati mentali associati</caption>
     <tr><th>Banda</th><th>Freq.</th><th>Stato</th></tr>
     <tr data-band="Delta: sonno profondo, patologie in veglia." tabindex="0"><td><strong>δ Delta</strong></td><td>&lt; 4 Hz</td><td>Sonno profondo</td></tr>
-    <tr data-band="Theta: sonnolenza, meditazione profonda." tabindex="0"><td><strong>θ Theta</strong></td><td>4–7 Hz</td><td>Sonnolenza / meditazione</td></tr>
+    <tr data-band="Theta: sonnolenza, meditazione profonda, sonno leggero." tabindex="0"><td><strong>θ Theta</strong></td><td>4–7 Hz</td><td>Sonnolenza / meditazione / sonno leggero</td></tr>
     <tr data-band="Alpha: veglia rilassata a occhi chiusi, lobi occipitali." tabindex="0"><td><strong>α Alpha</strong></td><td>8–12 Hz</td><td>Veglia rilassata</td></tr>
     <tr data-band="Mu: come alpha ma motorio; si desincronizza col movimento immaginato (ERD)." tabindex="0"><td><strong>μ Mu</strong></td><td>8–12 Hz</td><td>Corteccia motoria</td></tr>
     <tr data-band="Beta: veglia attiva, concentrazione, calcolo." tabindex="0"><td><strong>β Beta</strong></td><td>12–30 Hz</td><td>Concentrazione</td></tr>
-    <tr data-band="Gamma: integrazione multisensoriale; spesso sporcata da EMG." tabindex="0"><td><strong>γ Gamma</strong></td><td>30–80 Hz</td><td>Elaborazione complessa</td></tr>
+    <tr data-band="Gamma: integrazione multisensoriale e consolidamento delle memorie; spesso sporcata da EMG." tabindex="0"><td><strong>γ Gamma</strong></td><td>30–80 Hz</td><td>Elaborazione complessa</td></tr>
   </table></div>
   <p class="lab-result" id="eegResult" role="status">Seleziona una banda per i dettagli.</p>
   <h3>Sistema 10-20</h3>
-  <p>Posizionamento elettrodi in % (10/20) da Nasion–Inion. Lettere = lobo (F, C, T, P, O). Numeri: <strong>dispari = sinistra, pari = destra, Z = midline</strong> (es. Fz, Cz, Pz).</p>
+  <p>Posizionamento elettrodi in % (10/20) delle distanze tra punti anatomici: Nasion, Inion e punti preauricolari. Lettere = lobo (F frontale, C centrale, T temporale, P parietale, O occipitale). Numeri: <strong>dispari = sinistra, pari = destra, Z = midline</strong> (es. Fz, Cz, Pz).</p>
   <h3>Paradigmi: P300 e Motor Imagery</h3>
   <ul>
-    <li><strong>P300 Speller:</strong> matrice 6×6 che lampeggia; lo stimolo raro atteso genera un ERP positivo ~<strong>300 ms</strong> (oddball). Incrocio riga/colonna = lettera. Il P300 è di pochi µV → serve <strong>averaging</strong> su N trial (SNR ∝ √N). <em>Overt attention</em> (fissare) ≫ <em>covert</em> (attenzione mentale).</li>
+    <li><strong>P300 Speller:</strong> matrice 6×6 che lampeggia; lo stimolo raro atteso genera un ERP positivo ~<strong>300 ms</strong> (oddball, finestra EEG 0–800 ms). Incrocio riga/colonna = lettera. Il P300 è di pochi µV → serve <strong>averaging</strong> su N trial (SNR ∝ √N). <em>Overt attention</em> (fissare) ≫ <em>covert</em> (attenzione mentale).</li>
     <li><strong>Motor Imagery:</strong> per Locked-In Syndrome: immaginare di muovere mano/piedi desincronizza il ritmo <strong>μ</strong> controlaterale (ERD). Stesse mappe dell'esecuzione reale.</li>
   </ul>
   <div class="lab" data-lab="p300">
@@ -412,7 +427,21 @@ GSR_tonica = filtfilt(bT, aT, gsr_raw);
 GSR_fasica = gsr_raw - GSR_tonica;
 % Picchi emotivi ~ arousal
 [isEv, locEv] = islocalmax(GSR_fasica, 'MinProminence', 0.01);
-num_eventi = sum(isEv);</code></pre>
+num_eventi = sum(isEv);
+% Alternativa: fasica isolata con passa-banda 0.05-1 Hz
+[bF, aF] = butter(2, [0.05 1]/(fs/2), 'bandpass');
+GSR_fasica_filt = filtfilt(bF, aF, gsr_raw);</code></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-head"><span>Audio — decimazione e aliasing udibile</span><button class="btn btn-ghost btn-copy" type="button" data-copy="codeAudio">Copia</button></div>
+<pre id="codeAudio"><code>% Audio originale (di solito fs = 44100 Hz)
+[y, fs_orig] = audioread('brano.wav');
+% Sottocampionamento di fattore M
+M = 4;
+y_down = y(1:M:end);       % tiene 1 campione ogni M
+fs_nuova = fs_orig / M;    % nuova frequenza di campionamento
+% Si sente l'aliasing se fs_nuova &lt; 2*f_max
+sound(y_down, fs_nuova);</code></pre>
   </div>
   <div class="code-block">
     <div class="code-head"><span>ML — SVM, k-NN, validazione K-Fold e matrice di confusione</span><button class="btn btn-ghost btn-copy" type="button" data-copy="codeMl">Copia</button></div>
@@ -430,6 +459,8 @@ confusionchart(Y, kfoldPredict(cv));</code></pre>
 <section class="chapter" id="cap07" data-searchable aria-labelledby="cap07t">
   <p class="chap-kicker">Capitolo 07 · Preparazione alla prova scritta</p>
   <h2 id="cap07t">Eserciziario svolto</h2>
+  <p class="tldr"><strong>Come usarlo:</strong> leggi le schede rapide; apri lo svolgimento solo dove esiti. I numeri tornano sempre con tre formule: Nyquist, 6,02·b + 1,76 e A²/2.</p>
+  <h3>Schede rapide (ripasso in 2 minuti)</h3>
   <div class="cards">
     <article class="card"><h4>1 · Aliasing</h4><p>x=sin(2π·100t), f<sub>s</sub>=150 → Nyq=200, alias=|150−100|= <strong>50 Hz</strong>.</p></article>
     <article class="card"><h4>2 · Quantizzazione</h4><p>0–5 V, 8 bit: L=256, Δ=5/255≈<strong>19,6 mV</strong>, SQNR≈<strong>49,9 dB</strong>, R=8·200=<strong>1600 bps</strong> (16 bit → 98 dB, 3200 bps).</p></article>
@@ -441,6 +472,52 @@ confusionchart(Y, kfoldPredict(cv));</code></pre>
     <article class="card"><h4>8 · Quesiti a risposta multipla</h4><p>Due bit aggiuntivi: circa +12 dB. Errore massimo: ±Δ/2. Da 8 a 16 bit: livelli ×256. Dither: decorrela errore e segnale. Segnale a 15 kHz campionato a 20 kHz: <strong>aliasing</strong> (occorrerebbero oltre 30 kHz).</p></article>
   </div>
   <div class="danger"><strong>Livello ADC con fondoscala arbitrario:</strong> Livello = round((V<sub>in</sub>−V<sub>min</sub>)/Δ). Con −5…+5 V e ingresso 2,15 V: round(7,15/0,0392) = <strong>182</strong> (il calcolo semplificato restituirebbe erroneamente 55).</div>
+  <h3>Svolgimenti passo-passo (apri solo ciò che ti serve)</h3>
+  <details class="exercise">
+    <summary><span><strong>Tipo 8A · 12 kHz e 40 dB:</strong> frequenza, bit e bitrate</span></summary>
+    <div>
+      <ol>
+        <li><strong>Campionamento minimo:</strong> f<sub>s</sub> ≥ 2·12 kHz = <strong>24 kHz</strong>.</li>
+        <li><strong>Bit necessari:</strong> 40 = 6,02·n + 1,76 → n ≈ 6,35 → si arrotonda per eccesso a <strong>7 bit</strong>.</li>
+        <li><strong>Bitrate:</strong> R = 24 000 × 7 = <strong>168 kbps</strong>.</li>
+      </ol>
+    </div>
+  </details>
+  <details class="exercise">
+    <summary><span><strong>Tipo 8B · ADC 0–5 V:</strong> da 2,15 V al livello 110</span></summary>
+    <div>
+      <ol>
+        <li><strong>Livelli:</strong> L = 2<sup>8</sup> = <strong>256</strong>.</li>
+        <li><strong>Passo:</strong> Δ = 5/255 ≈ <strong>19,6 mV</strong> (si divide per L−1 per includere entrambi gli estremi).</li>
+        <li><strong>Livello:</strong> round((2,15 − 0)/0,0196) = round(109,69) = <strong>110</strong>. Con fondoscala −5…+5 V la stessa formula dà <strong>182</strong>, non 55.</li>
+      </ol>
+    </div>
+  </details>
+  <details class="exercise">
+    <summary><span><strong>Tipo 8C · Le 10 idee che confondono:</strong> vero o falso in 30 secondi</span></summary>
+    <div>
+      <ul>
+        <li><strong>Quantizzazione</strong> = infiniti valori di <strong>ampiezza</strong> in livelli finiti. Il <strong>campionamento</strong> discretizza il <strong>tempo</strong>.</li>
+        <li>Dinamica 10 V su 1024 livelli → gradino ≈ <strong>10 mV</strong> (10/1024).</li>
+        <li>Più bit → SQNR <strong>aumenta</strong> (~6 dB per bit); +2 bit ≈ <strong>+12 dB</strong>.</li>
+        <li>Errore massimo di quantizzazione: <strong>±Δ/2</strong>.</li>
+        <li>Da 8 a 16 bit il rumore <strong>cala</strong>; la frequenza massima dipende da f<sub>s</sub>, <strong>non</strong> dai bit.</li>
+        <li>Segnale a 15 kHz campionato a 20 kHz → <strong>aliasing</strong> (servono oltre 30 kHz).</li>
+        <li><strong>Dither:</strong> rumore bianco prima di quantizzare per <strong>decorrelare</strong> errore e segnale.</li>
+        <li>Da 8 a 16 bit i livelli crescono di <strong>×256</strong> (256 → 65 536).</li>
+      </ul>
+    </div>
+  </details>
+  <details class="exercise">
+    <summary><span><strong>Tipo 8D · Energia e potenza:</strong> le tre regole d'oro</span></summary>
+    <div>
+      <ol>
+        <li><strong>Tempo infinito:</strong> sinusoide = segnale di <strong>potenza</strong> (E = ∞, P = A²/2).</li>
+        <li><strong>Un periodo T:</strong> E = <strong>50·T</strong> per A = 10.</li>
+        <li><strong>Frequenza:</strong> P dipende solo da A — se f raddoppia, P <strong>resta invariata</strong>.</li>
+      </ol>
+    </div>
+  </details>
 </section>
 
 <!-- CAP 08 -->
@@ -448,9 +525,9 @@ confusionchart(Y, kfoldPredict(cv));</code></pre>
   <p class="chap-kicker">Capitolo 08 · Analisi di un benchmark di riferimento</p>
   <h2 id="cap08t">Caso studio: dataset DEAP</h2>
   <ul class="fact-grid">
-    <li><strong>32</strong> partecipanti × <strong>40</strong> video musicali da 1 min (scelti dai tag Last.fm per coprire Russell)</li>
+    <li><strong>32</strong> partecipanti × <strong>40</strong> video musicali da 1 min, scelti dai tag Last.fm per coprire uniformemente i quadranti di Russell</li>
     <li><strong>EEG 32 canali</strong> + periferici (GSR, ECG, respiro, temperatura, PPG, EOG/EMG) + face video (22 sogg.)</li>
-    <li><strong>SAM 1–9:</strong> Arousal, Valence, Dominance, Liking. Distinzione tra emozioni <em>felt</em> (provate) ed <em>espresse</em> (mostrate).</li>
+    <li><strong>SAM 1–9</strong> (manichini di autovalutazione, scala continua): Arousal da calmo a eccitato, Valence da triste a felice, Dominance da sottomesso a dominante, Liking (gradimento). Distinzione tra emozioni <em>felt</em> (provate davvero) ed <em>espresse</em> (mostrate, magari simulate).</li>
     <li><strong>Modality fusion:</strong> EEG + periferici + <strong>MCA</strong> (feature dei video-stimolo) ≫ singolo segnale. Il face video fu registrato ma <em>non</em> usato nei task del paper.</li>
   </ul>
   <p class="muted">Ricadute: salute mentale pre-clinica (ansia), UX, gaming adattivo.</p>
@@ -460,10 +537,10 @@ confusionchart(Y, kfoldPredict(cv));</code></pre>
 <section class="chapter quiz" id="quiz" data-searchable aria-labelledby="quizt">
   <p class="chap-kicker">Verifica finale · Esercitazione in stile esame</p>
   <h2 id="quizt">Quiz di verifica</h2>
-  <p>12 domande sui tipi più frequenti, con feedback immediato e spiegazione. Il punteggio è conservato esclusivamente nel browser. <span class="muted">Nessun dato viene trasmesso all'esterno.</span></p>
+  <p>16 domande sui tipi più frequenti, con feedback immediato e spiegazione. Il punteggio è conservato esclusivamente nel browser. <span class="muted">Nessun dato viene trasmesso all'esterno.</span></p>
   <div class="quiz-bar">
     <div class="quiz-progress"><div id="quizProg"></div></div>
-    <p><strong id="quizScore">Punteggio: 0 / 12</strong> · <span id="quizBest">miglior punteggio: —</span></p>
+    <p><strong id="quizScore">Punteggio: 0 / 16</strong> · <span id="quizBest">miglior punteggio: —</span></p>
     <button class="btn btn-ghost" id="quizReset" type="button">Ricomincia</button>
   </div>
   <div id="quizBox"></div>
@@ -476,7 +553,7 @@ confusionchart(Y, kfoldPredict(cv));</code></pre>
   <div class="table-wrap"><table>
     <tr><th>Tema</th><th>Formula / regola</th></tr>
     <tr><td>Nyquist</td><td>f<sub>s</sub> &gt; 2·f<sub>max</sub> · alias = |f − k·f<sub>s</sub>| più vicino</td></tr>
-    <tr><td>Quantizzazione</td><td>L=2<sup>b</sup> · Δ=(max−min)/L · err ∈ [−Δ/2, Δ/2] · SQNR≈6,02b+1,76 · R=b·f<sub>s</sub></td></tr>
+    <tr><td>Quantizzazione</td><td>L=2<sup>b</sup> · Δ=(max−min)/(L−1) negli esercizi (formalmente /L) · err ∈ [−Δ/2, Δ/2] · SQNR≈6,02b+1,76 · R=b·f<sub>s</sub></td></tr>
     <tr><td>SNR</td><td>SNR<sub>dB</sub>=10·log₁₀(P<sub>seg</sub>/P<sub>rum</sub>) · P<sub>sin</sub>=A²/2 · E<sub>T</sub>=(A²/2)·T</td></tr>
     <tr><td>Filtri</td><td>Media: y=mean(finestra) · Mediano: y=mediana · notch 50 Hz · ECG BP 0,5–25 Hz · SCL LP 0,05 Hz</td></tr>
     <tr><td>ML data</td><td>z=(x−μ)/σ · split→fit(solo train)→transform · K-Fold · LOSO = subject-independent</td></tr>
